@@ -80,7 +80,7 @@ client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
         await newEmote.save();
     }
 
-    const emotes = userDB.emotes;
+    const emotes = await userDB.emotes;
     emotes.forEach(async (emote: { name: string; id: string; emote: string; usage: number }) => {
         if (messageText.includes(emote.name)) {
             for (let i = 0; i < messageText.split(emote.name).length - 1; i++) {
