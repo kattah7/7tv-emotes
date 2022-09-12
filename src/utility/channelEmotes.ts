@@ -5,7 +5,10 @@ const channelEmotes = async (channel: string) => {
     const emotes = res.map((emote: { name: string; id: string }) => {
         return {
             name: emote.name,
-            emote: `https://cdn.7tv.app/emote/${emote.id}/3x`,
+            emote: emote.id,
+            usage: 0,
+            isEmote: true,
+            Date: Date.now(),
         };
     }, []);
     return emotes;

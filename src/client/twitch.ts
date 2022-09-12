@@ -1,4 +1,4 @@
-import { ChatClient } from '@kararty/dank-twitch-irc';
+import { ChatClient, AlternateMessageModifier, SlowModeRateLimiter } from '@kararty/dank-twitch-irc';
 import { bot } from '../../config.json';
 import { channelEmotes } from '../utility/channelEmotes';
 import { Emote } from '../utility/db';
@@ -14,6 +14,8 @@ const client = new ChatClient({
 });
 
 const initialize = async () => {
+    client.use(new AlternateMessageModifier(client));
+    client.use(new SlowModeRateLimiter(client, 10));
     client.connect();
     try {
         await client.join('altaccountpoggers');
@@ -31,10 +33,12 @@ client.on('JOIN', async ({ channelName }) => {
     Logger.info(`Joined ${channelName}`);
     const userDB = await Emote.findOne({ name: channelName });
     if (!userDB) {
-        const user = new Emote({
+        const channelEmote = await channelEmotes(channelName);
+        const newEmote = new Emote({
             name: channelName,
+            emotes: channelEmote,
         });
-        await user.save();
+        await newEmote.save();
     }
 });
 
@@ -65,29 +69,26 @@ client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
             }
         }
     }
-    const emotes = await channelEmotes(channelName);
-    emotes.forEach(async (emote: { name: string; id: string; emote: string }) => {
+
+    const userDB = await Emote.findOne({ name: channelName });
+    if (!userDB) {
+        const channelEmote = await channelEmotes(channelName);
+        const newEmote = new Emote({
+            name: channelName,
+            emotes: channelEmote,
+        });
+        await newEmote.save();
+    }
+
+    const emotes = userDB.emotes;
+    emotes.forEach(async (emote: { name: string; id: string; emote: string; usage: number }) => {
         if (messageText.includes(emote.name)) {
             for (let i = 0; i < messageText.split(emote.name).length - 1; i++) {
-                const userDB = await Emote.findOne({ name: channelName });
-                const linkEmote = /https:\/\/(cdn\.)?7tv\.app\/emote\/(\w{24})\/3x/.exec(emote.emote);
-                const emoteDB = userDB?.emotes.find(
-                    (e: { name: string; emote: string; usage: number }) => e.emote === linkEmote[2]
+                emote.usage++;
+                await Emote.updateOne(
+                    { 'name': channelName, 'emotes.name': emote.name },
+                    { $set: { 'emotes.$.usage': emote.usage } }
                 );
-                if (emoteDB) {
-                    emoteDB.usage += 1;
-                    await userDB?.save();
-                } else {
-                    const linkEmote = /https:\/\/(cdn\.)?7tv\.app\/emote\/(\w{24})\/3x/.exec(emote.emote);
-                    userDB?.emotes.push({
-                        name: emote.name,
-                        emote: linkEmote[2],
-                        usage: 1,
-                        isEmote: true,
-                        Date: Date.now(),
-                    });
-                    await userDB?.save();
-                }
             }
         }
     });

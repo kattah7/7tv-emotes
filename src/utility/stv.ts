@@ -29,18 +29,20 @@ const Stv = async () => {
                     });
                     await userDB?.save();
                 } else {
-                    const updateIsEmote = userDB?.emotes.find((emote) => emote.emote == emote_id);
-                    updateIsEmote.isEmote = true;
-                    await userDB?.save();
+                    await Emote.updateOne(
+                        { 'name': channel, 'emotes.emote': emote_id },
+                        { $set: { 'emotes.$.isEmote': true } }
+                    );
                 }
                 Logger.info(`Added 7tv emote, ${name} by ${actor} in ${channel}`);
                 break;
             }
             case 'REMOVE': {
                 if (emoteDB) {
-                    const updateIsEmote = userDB?.emotes.find((emote) => emote.emote == emote_id);
-                    updateIsEmote.isEmote = false;
-                    await userDB?.save();
+                    await Emote.updateOne(
+                        { 'name': channel, 'emotes.emote': emote_id },
+                        { $set: { 'emotes.$.isEmote': false } }
+                    );
                 }
                 Logger.info(`Removed 7tv + ${name} by ${actor} in ${channel}`);
                 break;
