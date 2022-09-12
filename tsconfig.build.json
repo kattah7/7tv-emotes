@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "incremental": true,
+        "rootDir": ".",
+        "outDir": "build",
+        "listEmittedFiles": true
+    },
+    "include": ["./src/**/*"],
+    "exclude": ["./src/**/*.test.ts", "./src/**/*.spec.ts", "./src/**/__tests__/**/*.ts"]
+}
