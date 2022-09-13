@@ -1,5 +1,6 @@
 # 7tv emote tracker.
 if you dont do the steps below, use api.kattah.me/c/:user
+for global emotes use https://api.kattah.me/global
 
 git clone  
 make sure to have mongoDB  
