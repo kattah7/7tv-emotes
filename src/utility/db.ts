@@ -23,6 +23,8 @@ DB.connection.on('error', (err) => {
 
 const EmoteSchema = new DB.Schema({
     name: String,
+    id: String,
+    StvId: String,
     emotes: [{ name: String, emote: String, usage: Number, isEmote: Boolean, Date: Number }],
 });
 
