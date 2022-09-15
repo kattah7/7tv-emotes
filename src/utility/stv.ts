@@ -1,63 +1,77 @@
-import EventSource from 'eventsource';
+import WebSocket from 'ws';
 import * as Logger from './logger';
 import { Emote, Channels } from '../utility/db';
+import { StvInfo } from '../utility/parseUID';
 
-const Stv = async () => {
-    const channels = await Channels.find();
-    const channelsMapped = channels.map((channel) => channel.name);
-    const sevenEvents = new EventSource(`https://events.7tv.app/v1/channel-emotes?channel=${channelsMapped}`);
-
-    sevenEvents.addEventListener('ready', (e: { data: string }) => {
-        Logger.info('Ready', e.data);
+export const StvWS = async () => {
+    var WS = new WebSocket(`wss://events.7tv.io/v3`);
+    WS.on('open', async () => {
+        Logger.info('Connected to 7TV');
+        const channels = await Channels.find();
+        for (const channel of channels) {
+            const stvID = (await StvInfo(channel.id)).user.id;
+            if (!stvID) continue;
+            WS.send(
+                JSON.stringify({
+                    op: 35,
+                    d: {
+                        type: 'emote_set.update',
+                        condition: {
+                            object_id: stvID,
+                        },
+                    },
+                })
+            );
+        }
     });
 
-    sevenEvents.addEventListener('update', async (e: { data: string }) => {
-        const { action, name, actor, channel, emote, emote_id } = JSON.parse(e.data);
-        const userDB = await Emote.findOne({ name: channel });
-        const emoteDB = userDB?.emotes.find(
-            (e: { name: string; emote: string; usage: number }) => e.emote === emote_id
-        );
-        switch (action) {
-            case 'ADD': {
-                if (!emoteDB) {
-                    userDB?.emotes.push({
-                        name: name,
-                        emote: emote_id,
+    WS.on('message', async (data: any) => {
+        const message = JSON.parse(data).d;
+        if (message.body) {
+            if (message.body.pulled) {
+                await Emote.updateOne(
+                    { 'StvId': message.body.id, 'emotes.emote': message.body.pulled[0].old_value.id },
+                    { $set: { 'emotes.$.isEmote': false } }
+                );
+            } else if (message.body.pushed) {
+                const emoteDB = await Emote.findOne({ StvId: message.body.id });
+                const doesEmoteExist = emoteDB?.emotes.find((emote) => emote.emote == message.body.pushed[0].value.id);
+                if (!doesEmoteExist) {
+                    emoteDB?.emotes.push({
+                        name: message.body.pushed[0].value.name,
+                        emote: message.body.pushed[0].value.id,
                         usage: 0,
                         isEmote: true,
                         Date: Date.now(),
                     });
-                    await userDB?.save();
-                } else {
-                    await Emote.updateOne(
-                        { 'name': channel, 'emotes.emote': emote_id },
-                        { $set: { 'emotes.$.isEmote': true } }
-                    );
+                    await emoteDB?.save();
+                    return;
                 }
-                Logger.info(`Added 7tv emote, ${name} by ${actor} in ${channel}`);
-                break;
-            }
-            case 'REMOVE': {
-                if (emoteDB) {
-                    await Emote.updateOne(
-                        { 'name': channel, 'emotes.emote': emote_id },
-                        { $set: { 'emotes.$.isEmote': false } }
-                    );
-                }
-                Logger.info(`Removed 7tv + ${name} by ${actor} in ${channel}`);
-                break;
-            }
-            case 'UPDATE': {
-                if (emoteDB.emote == emote_id || emoteDB.name != name) {
-                    const updateEmote = userDB?.emotes.find((emote) => emote.emote == emote_id);
-                    updateEmote.name = name;
-                    await userDB?.save();
-                }
-                Logger.info(`Updated 7tv emote, ${emote.name} to ${name} by ${actor} in ${channel}`);
-                break;
+                await Emote.updateOne(
+                    { 'StvId': message.body.id, 'emotes.emote': message.body.pushed[0].value.id },
+                    { $set: { 'emotes.$.isEmote': true } }
+                );
+            } else if (message.body.updated) {
+                await Emote.updateOne(
+                    { 'StvId': message.body.id, 'emotes.emote': message.body.updated[0].value.id },
+                    { $set: { 'emotes.$.name': message.body.updated[0].value.name } }
+                );
             }
         }
     });
-};
 
-export { Stv };
+    WS.on('close', () => {
+        Logger.info('Disconnected from 7TV, reconnecting in 1 second');
+        setTimeout(() => {
+            StvWS();
+        }, 1000);
+        // try to reconnect
+    });
+
+    WS.on('error', (err) => {
+        Logger.error(`7TV Socket encountered an error: ${err}`);
+        setTimeout(() => {
+            StvWS();
+        }, 1000);
+    });
+};
