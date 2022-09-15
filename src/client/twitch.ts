@@ -16,6 +16,7 @@ const initialize = async () => {
     client.use(new AlternateMessageModifier(client));
     client.use(new SlowModeRateLimiter(client, 10));
     client.connect();
+    Logger.info('Connected to Twitch');
     try {
         await client.join('altaccountpoggers');
         const channels = await Channels.find();
@@ -25,7 +26,6 @@ const initialize = async () => {
     } catch (err) {
         Logger.error(err);
     }
-    Logger.info('Connected to Twitch');
 };
 
 client.on('JOIN', async ({ channelName }) => {
