@@ -5,3 +5,9 @@ export async function UserInfo(username: string) {
     const Data = await fetch(`https://api.ivr.fi/v2/twitch/user?login=${username}`).then((res) => res.json());
     return Data;
 }
+
+export async function StvInfo(username: string) {
+    if (!username) return null;
+    const Data = await fetch(`https://7tv.io/v3/users/twitch/${username}`).then((res) => res.json());
+    return Data;
+}
