@@ -1,8 +1,7 @@
 import { ChatClient, AlternateMessageModifier, SlowModeRateLimiter } from '@kararty/dank-twitch-irc';
 import { bot } from '../../config.json';
 import { channelEmotes } from '../utility/channelEmotes';
-import { Emote } from '../utility/db';
-import { Channels } from '../utility/db';
+import { Emote, Channels } from '../utility/db';
 import { UserInfo } from '../utility/parseUID';
 import * as Logger from '../utility/logger';
 
@@ -80,18 +79,34 @@ client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
         await newEmote.save();
     }
 
-    const emotes = await userDB.emotes;
-    emotes.forEach(async (emote: { name: string; id: string; emote: string; usage: number }) => {
-        if (messageText.includes(emote.name)) {
-            for (let i = 0; i < messageText.split(emote.name).length - 1; i++) {
-                emote.usage++;
-                await Emote.updateOne(
-                    { 'name': channelName, 'emotes.name': emote.name },
-                    { $set: { 'emotes.$.usage': emote.usage } }
-                );
+    const knownEmoteNames = new Set(userDB.emotes.map((emote) => emote.name));
+
+    const emotesUsedByName = {};
+
+    for (const word of messageText.split(/\s/g)) {
+        if (knownEmoteNames.has(word)) {
+            if (!(word in emotesUsedByName)) {
+                emotesUsedByName[word] = 1;
+                continue;
             }
         }
-    });
+        ++emotesUsedByName[word];
+    }
+
+    if (Object.entries(emotesUsedByName).length > 0) {
+        const operation = Emote.collection.initializeUnorderedBulkOp();
+        for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
+            operation.find({ 'name': channelName, 'emotes.name': emoteName }).update({
+                $inc: { 'emotes.$.usage': count },
+            });
+        }
+
+        try {
+            await operation.execute();
+        } catch (err) {
+            Logger.error(err);
+        }
+    }
 });
 
 export { client, initialize };
