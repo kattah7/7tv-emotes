@@ -2,7 +2,7 @@ import { ChatClient, AlternateMessageModifier, SlowModeRateLimiter } from '@kara
 import { bot } from '../../config.json';
 import { channelEmotes } from '../utility/channelEmotes';
 import { Emote, Channels } from '../utility/db';
-import { UserInfo } from '../utility/parseUID';
+import { UserInfo, StvInfo } from '../utility/parseUID';
 import * as Logger from '../utility/logger';
 
 const client = new ChatClient({
@@ -30,11 +30,23 @@ const initialize = async () => {
 
 client.on('JOIN', async ({ channelName }) => {
     Logger.info(`Joined ${channelName}`);
-    const userDB = await Emote.findOne({ name: channelName });
-    if (!userDB) {
-        const channelEmote = await channelEmotes(channelName);
+    const channelID = (await UserInfo(channelName))[0].id;
+    const userDB = await Emote.findOne({ id: channelID });
+    const ID = userDB?.StvId;
+    if (!ID) {
+        await Emote.findOneAndUpdate(
+            { name: channelName },
+            { StvId: (await StvInfo(channelID)).user.id, id: channelID }
+        );
+    }
+
+    const userDB2 = await Emote.findOne({ id: channelID });
+    if (!userDB2) {
+        const channelEmote = await channelEmotes(channelID);
         const newEmote = new Emote({
             name: channelName,
+            id: channelID,
+            StvId: (await StvInfo(channelID)).user.id,
             emotes: channelEmote,
         });
         await newEmote.save();
@@ -45,7 +57,7 @@ client.on('PART', ({ channelName }) => {
     Logger.info(`Parted ${channelName}`);
 });
 
-client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
+client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
     if (senderUsername == bot.admin) {
         if (messageText.startsWith('!7tvlog')) {
             const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
@@ -69,17 +81,7 @@ client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
         }
     }
 
-    const userDB = await Emote.findOne({ name: channelName });
-    if (!userDB) {
-        const channelEmote = await channelEmotes(channelName);
-        const newEmote = new Emote({
-            name: channelName,
-            emotes: channelEmote,
-        });
-        await newEmote.save();
-    }
-
-    const knownEmoteNames = new Set(userDB.emotes.map((emote) => emote.name));
+    const knownEmoteNames = new Set((await Emote.findOne({ id: channelID })).emotes.map((emote) => emote.name));
 
     const emotesUsedByName = {};
 
@@ -96,7 +98,7 @@ client.on('PRIVMSG', async ({ senderUsername, channelName, messageText }) => {
     if (Object.entries(emotesUsedByName).length > 0) {
         const operation = Emote.collection.initializeUnorderedBulkOp();
         for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-            operation.find({ 'name': channelName, 'emotes.name': emoteName }).update({
+            operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
                 $inc: { 'emotes.$.usage': count },
             });
         }
