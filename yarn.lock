@@ -3621,7 +3621,7 @@ globby@^11.0.2, globby@^11.0.3, globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
-got@^11.8.2:
+got@11.8.5, got@^11.8.2:
   version "11.8.5"
   resolved "https://registry.npmjs.org/got/-/got-11.8.5.tgz"
   integrity sha512-o0Je4NvQObAuZPHLFoRSkdG2lTgtcynqymzg2Vupdx6PorhaT5MCbIyXG6d4D94kk8ZG57QeosgdiqfJWhEhlQ==
