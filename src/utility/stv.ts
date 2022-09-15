@@ -4,7 +4,7 @@ import { Emote, Channels } from '../utility/db';
 import { StvInfo } from '../utility/parseUID';
 
 export const StvWS = async () => {
-    var WS = new WebSocket(`wss://events.7tv.io/v3`);
+    const WS = new WebSocket(`wss://events.7tv.io/v3`);
     WS.on('open', async () => {
         Logger.info('Connected to 7TV');
         const channels = await Channels.find();
@@ -25,7 +25,7 @@ export const StvWS = async () => {
         }
     });
 
-    WS.on('message', async (data: any) => {
+    WS.on('message', async (data: string) => {
         const message = JSON.parse(data).d;
         if (message.body) {
             if (message.body.pulled) {
