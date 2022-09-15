@@ -1,5 +1,6 @@
 # 7tv emote tracker.
 if you dont do the steps below, use api.kattah.me/c/:user  
+for top emotes of all combined channels, use api.kattah.me/top  
 for global emotes use https://api.kattah.me/global  
 Ratelimit: rate=1r/s burst=3
 
