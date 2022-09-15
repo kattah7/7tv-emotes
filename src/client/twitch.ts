@@ -20,7 +20,7 @@ const initialize = async () => {
         await client.join('altaccountpoggers');
         const channels = await Channels.find();
         for (const channel of channels) {
-            client.join(channel.name);
+            await client.join(channel.name);
         } // Join all channels in the database
     } catch (err) {
         Logger.error(err);
