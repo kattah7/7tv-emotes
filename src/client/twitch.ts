@@ -57,7 +57,7 @@ client.on('PART', ({ channelName }) => {
     Logger.info(`Parted ${channelName}`);
 });
 
-client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
+client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
     if (senderUsername == bot.admin) {
         if (messageText.startsWith('!7tvlog')) {
             const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
@@ -75,6 +75,19 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
                 });
                 await channel.save();
                 await client.join(args[1]);
+                const channelID = (await UserInfo(args[1]))[0].id;
+                const userDB2 = await Emote.findOne({ id: channelID });
+                if (!userDB2) {
+                    const channelEmote = await channelEmotes(channelID);
+                    const newEmote = new Emote({
+                        name: args[1],
+                        id: channelID,
+                        StvId: (await StvInfo(channelID)).user.id,
+                        emotes: channelEmote,
+                    });
+                    await newEmote.save();
+                }
+                Logger.info('Joined ' + args[1]);
             } catch (err) {
                 Logger.error(err);
             }
