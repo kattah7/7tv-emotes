@@ -61,33 +61,34 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
     if (senderUsername == bot.admin) {
         if (messageText.startsWith('!7tvlog')) {
             const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
-            const isInChannel = await Channels.findOne({ name: args[1] });
+            const username = args[1].toLowerCase();
+            const isInChannel = await Channels.findOne({ name: username });
             if (isInChannel) {
-                Logger.info(`Already in ${args[1]}`);
+                Logger.info(`Already in ${username}`);
                 return;
             }
 
             try {
                 const channel = new Channels({
-                    name: args[1],
-                    id: (await UserInfo(args[1]))[0].id,
+                    name: username,
+                    id: (await UserInfo(username))[0].id,
                     Date: Date.now(),
                 });
                 await channel.save();
-                await client.join(args[1]);
-                const channelID = (await UserInfo(args[1]))[0].id;
+                await client.join(username);
+                const channelID = (await UserInfo(username))[0].id;
                 const userDB2 = await Emote.findOne({ id: channelID });
                 if (!userDB2) {
                     const channelEmote = await channelEmotes(channelID);
                     const newEmote = new Emote({
-                        name: args[1],
+                        name: username,
                         id: channelID,
                         StvId: (await StvInfo(channelID)).user.id,
                         emotes: channelEmote,
                     });
                     await newEmote.save();
                 }
-                Logger.info('Joined ' + args[1]);
+                Logger.info('Joined ' + username);
             } catch (err) {
                 Logger.error(err);
             }
