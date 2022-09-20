@@ -28,9 +28,13 @@ router.get('/c/:user', async (req, res) => {
             Date: emote.Date,
         };
     });
+
+    const mapByTopUsage = emotesMapped.sort((a, b) => b.usage - a.usage);
+    const sliceHundred = mapByTopUsage.slice(0, 100);
+
     return res.status(200).json({
         success: true,
-        data: emotesMapped,
+        data: sliceHundred,
     });
 });
 
