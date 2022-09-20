@@ -3,8 +3,10 @@ import * as Logger from './logger';
 import { Emote, Channels } from '../utility/db';
 import { StvInfo } from '../utility/parseUID';
 
+let WS = new WebSocket(`wss://events.7tv.io/v3`);
+export { WS };
 export const StvWS = async () => {
-    const WS = new WebSocket(`wss://events.7tv.io/v3`);
+    // export function that sends json stringify
     WS.on('open', async () => {
         Logger.info('Connected to 7TV');
         const channels = await Channels.find();
@@ -74,4 +76,6 @@ export const StvWS = async () => {
             StvWS();
         }, 1000);
     });
+
+    return WS;
 };

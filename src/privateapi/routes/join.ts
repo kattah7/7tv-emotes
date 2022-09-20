@@ -3,6 +3,7 @@ import { client } from '../../client/twitch';
 import { Emote, Channels } from '../../utility/db';
 import { UserInfo, StvInfo } from '../../utility/parseUID';
 import { channelEmotes } from '../../utility/channelEmotes';
+import { WS } from '../../utility/stv';
 const router = express.Router();
 
 router.post('/bot/join', async (req: any, res: any) => {
@@ -35,6 +36,16 @@ router.post('/bot/join', async (req: any, res: any) => {
                 await newEmote.save();
             }
             await client.join(username);
+            const sendWSJSONStringyToSTV = {
+                op: 35,
+                d: {
+                    type: 'emote_set.update',
+                    condition: {
+                        object_id: (await StvInfo((await UserInfo(username))[0].id)).user.id,
+                    },
+                },
+            };
+            WS.send(JSON.stringify(sendWSJSONStringyToSTV));
             return res.status(200).json({
                 success: true,
                 message: `Joined ${username}`,

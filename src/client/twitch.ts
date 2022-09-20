@@ -3,6 +3,7 @@ import { bot } from '../../config.json';
 import { channelEmotes } from '../utility/channelEmotes';
 import { Emote, Channels } from '../utility/db';
 import { UserInfo, StvInfo } from '../utility/parseUID';
+import { WS } from '../utility/stv';
 import * as Logger from '../utility/logger';
 
 const client = new ChatClient({
@@ -88,6 +89,16 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
                     await newEmote.save();
                 }
                 await client.join(username);
+                const sendWSJSONStringyToSTV = {
+                    op: 35,
+                    d: {
+                        type: 'emote_set.update',
+                        condition: {
+                            object_id: (await StvInfo(channelID)).user.id,
+                        },
+                    },
+                };
+                WS.send(JSON.stringify(sendWSJSONStringyToSTV));
                 Logger.info('Newly Joined ' + username);
             } catch (err) {
                 Logger.error(err);
