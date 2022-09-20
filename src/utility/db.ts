@@ -1,7 +1,7 @@
 import DB from 'mongoose';
 import * as Logger from './logger';
 
-const mongoDB = async () => {
+const mongoDB = () => {
     try {
         DB.connect(`mongodb://127.0.0.1:27017/stv`, {});
     } catch (err) {
@@ -36,4 +36,5 @@ const ChannelSchema = new DB.Schema({
 
 const Channels = DB.model('Channels', ChannelSchema);
 const Emote = DB.model('Emote', EmoteSchema);
+
 export { Emote, Channels, mongoDB, DB };

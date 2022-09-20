@@ -75,7 +75,6 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
                     Date: Date.now(),
                 });
                 await channel.save();
-                await client.join(username);
                 const channelID = (await UserInfo(username))[0].id;
                 const userDB2 = await Emote.findOne({ id: channelID });
                 if (!userDB2) {
@@ -88,7 +87,8 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
                     });
                     await newEmote.save();
                 }
-                Logger.info('Joined ' + username);
+                await client.join(username);
+                Logger.info('Newly Joined ' + username);
             } catch (err) {
                 Logger.error(err);
             }
