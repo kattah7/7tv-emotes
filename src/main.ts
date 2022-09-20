@@ -3,6 +3,7 @@ import { StvWS } from './utility/stv';
 import { mongoDB } from './utility/db';
 import * as Logger from './utility/logger';
 require('./api/server');
+require('./privateapi/server');
 
 async function init() {
     try {

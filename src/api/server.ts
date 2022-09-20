@@ -4,7 +4,7 @@ import cors from 'cors';
 import channelInfo from './routes/channelInfo';
 import global from './routes/global';
 import top from './routes/topemotes';
-import join from './routes/join';
+import join from '../privateapi/routes/join';
 import * as Logger from '../utility/logger';
 import { bot } from '../../config.json';
 
