@@ -15,6 +15,15 @@ router.post('/bot/join', async (req: any, res: any) => {
         });
     }
 
+    const ID = (await UserInfo(username))[0].id;
+    const STV = await StvInfo(ID);
+    if (STV.error) {
+        return res.status(400).json({
+            success: false,
+            message: STV.error,
+        });
+    }
+
     const channel = await Channels.findOne({ name: username });
     if (!channel) {
         try {
@@ -35,7 +44,6 @@ router.post('/bot/join', async (req: any, res: any) => {
                 });
                 await newEmote.save();
             }
-            await client.join(username);
             const sendWSJSONStringyToSTV = {
                 op: 35,
                 d: {
@@ -46,6 +54,7 @@ router.post('/bot/join', async (req: any, res: any) => {
                 },
             };
             WS.send(JSON.stringify(sendWSJSONStringyToSTV));
+            await client.join(username);
             return res.status(200).json({
                 success: true,
                 message: `Joined ${username}`,

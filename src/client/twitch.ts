@@ -63,6 +63,13 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
         if (messageText.startsWith('!7tvlog')) {
             const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
             const username = args[1].toLowerCase();
+            const ID = (await UserInfo(username))[0].id;
+            const STV = await StvInfo(ID);
+            if (STV.error) {
+                Logger.info(`7TV Error: ${STV.error}`);
+                return;
+            }
+
             const isInChannel = await Channels.findOne({ name: username });
             if (isInChannel) {
                 Logger.info(`Already in ${username}`);
