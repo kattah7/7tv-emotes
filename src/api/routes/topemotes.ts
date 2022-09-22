@@ -11,7 +11,7 @@ router.get('/top', async (req, res) => {
         });
     });
     const sortedEmotes = PushAllEmotes.sort((a, b) => b.usage - a.usage);
-    const topEmotes = sortedEmotes.slice(0, 50);
+    const topEmotes = sortedEmotes.slice(0, 25);
     const ifEmoteIdIsSameCombine = [];
     topEmotes.forEach((emote) => {
         const doesEmoteExist = ifEmoteIdIsSameCombine.find((emote2) => emote2.emote == emote.emote);
