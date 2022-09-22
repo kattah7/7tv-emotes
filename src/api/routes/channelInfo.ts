@@ -19,7 +19,7 @@ router.get('/c/:user', async (req, res) => {
         });
     }
 
-    const emotesMapped = channelEmotes.emotes.map((emote) => {
+    const emotesMapped = channelEmotes.emotes.map((emote: any) => {
         return {
             name: emote.name,
             emote: emote.emote,
