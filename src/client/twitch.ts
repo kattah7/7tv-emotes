@@ -114,11 +114,10 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
     }
 
     const knownEmoteNames = new Set(
-        (await Emote.findOne({ id: '175316629' })).emotes
+        (await Emote.findOne({ id: channelID })).emotes
             .filter((emote) => emote.isEmote === true)
             .map((emote) => emote.name)
     );
-    console.log(knownEmoteNames);
 
     const emotesUsedByName = {};
 
