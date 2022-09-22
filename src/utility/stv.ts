@@ -29,16 +29,11 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: string) => {
         const { op, t, d } = JSON.parse(data);
-        let timeout: NodeJS.Timeout;
-        timeout = setTimeout(() => {
+        if (op == 4) {
             WS.close();
             WS = new WebSocket(`wss://events.7tv.io/v3`);
             StvWS();
-            Logger.info("Reconnecting to 7TV's WS");
-        }, 75000);
-        if ((timeout as unknown as number) % 2 === 0 || op === 2) {
-            clearTimeout(timeout);
-            Logger.info("7TV's WS is still alive");
+            Logger.info('Reconnected to 7TV');
         }
 
         if (d.body) {
