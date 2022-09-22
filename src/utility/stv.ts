@@ -7,8 +7,8 @@ let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
     // export function that sends json stringify
-    WS.on('open', async () => {
-        Logger.info('Connected to 7TV');
+    WS.on('open', async (msg) => {
+        Logger.info('Connected to 7TV', msg);
         const channels = await Channels.find();
         for (const channel of channels) {
             const stvID = (await StvInfo(channel.id)).user.id;
@@ -28,20 +28,32 @@ export const StvWS = async () => {
     });
 
     WS.on('message', async (data: string) => {
-        const message = JSON.parse(data).d;
-        if (message.body) {
-            if (message.body.pulled) {
+        const { op, t, d } = JSON.parse(data);
+        let timeout: NodeJS.Timeout;
+        timeout = setTimeout(() => {
+            WS.close();
+            WS = new WebSocket(`wss://events.7tv.io/v3`);
+            StvWS();
+            Logger.info("Reconnecting to 7TV's WS");
+        }, 30000);
+        if ((timeout as unknown as number) % 2 === 0 || op === 2) {
+            clearTimeout(timeout);
+            Logger.info("7TV's WS is still alive");
+        }
+
+        if (d.body) {
+            if (d.body.pulled) {
                 await Emote.updateOne(
-                    { 'StvId': message.body.id, 'emotes.emote': message.body.pulled[0].old_value.id },
+                    { 'StvId': d.body.id, 'emotes.emote': d.body.pulled[0].old_value.id },
                     { $set: { 'emotes.$.isEmote': false } }
                 );
-            } else if (message.body.pushed) {
-                const emoteDB = await Emote.findOne({ StvId: message.body.id });
-                const doesEmoteExist = emoteDB?.emotes.find((emote) => emote.emote == message.body.pushed[0].value.id);
+            } else if (d.body.pushed) {
+                const emoteDB = await Emote.findOne({ StvId: d.body.id });
+                const doesEmoteExist = emoteDB?.emotes.find((emote) => emote.emote == d.body.pushed[0].value.id);
                 if (!doesEmoteExist) {
                     emoteDB?.emotes.push({
-                        name: message.body.pushed[0].value.name,
-                        emote: message.body.pushed[0].value.id,
+                        name: d.body.pushed[0].value.name,
+                        emote: d.body.pushed[0].value.id,
                         usage: 0,
                         isEmote: true,
                         Date: Date.now(),
@@ -50,24 +62,16 @@ export const StvWS = async () => {
                     return;
                 }
                 await Emote.updateOne(
-                    { 'StvId': message.body.id, 'emotes.emote': message.body.pushed[0].value.id },
+                    { 'StvId': d.body.id, 'emotes.emote': d.body.pushed[0].value.id },
                     { $set: { 'emotes.$.isEmote': true } }
                 );
-            } else if (message.body.updated) {
+            } else if (d.body.updated) {
                 await Emote.updateOne(
-                    { 'StvId': message.body.id, 'emotes.emote': message.body.updated[0].value.id },
-                    { $set: { 'emotes.$.name': message.body.updated[0].value.name } }
+                    { 'StvId': d.body.id, 'emotes.emote': d.body.updated[0].value.id },
+                    { $set: { 'emotes.$.name': d.body.updated[0].value.name } }
                 );
             }
         }
-    });
-
-    WS.on('close', () => {
-        Logger.info('Disconnected from 7TV, reconnecting in 1 second');
-        setTimeout(() => {
-            StvWS();
-        }, 1000);
-        // try to reconnect
     });
 
     WS.on('error', (err) => {
