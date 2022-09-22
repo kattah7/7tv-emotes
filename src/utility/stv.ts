@@ -27,7 +27,7 @@ export const StvWS = async () => {
         }
     });
 
-    WS.on('message', async (data: string) => {
+    WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
         let timeout: NodeJS.Timeout;
         timeout = setTimeout(() => {
