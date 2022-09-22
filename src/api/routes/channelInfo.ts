@@ -31,10 +31,11 @@ router.get('/c/:user', async (req, res) => {
 
     const filterEmotesByTrue = emotesMapped.filter((emote: any) => emote.isEmote === true);
     const mapByTopUsage = filterEmotesByTrue.sort((a, b) => b.usage - a.usage);
+    const sliceHundred = mapByTopUsage.slice(0, 100);
 
     return res.status(200).json({
         success: true,
-        data: mapByTopUsage,
+        data: sliceHundred,
     });
 });
 
