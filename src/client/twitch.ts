@@ -22,6 +22,18 @@ const initialize = async () => {
         await client.join('altaccountpoggers');
         const channels = await Channels.find();
         for (const channel of channels) {
+            const channelID = (await UserInfo(channel.name))[0].id;
+            const userDB = await Emote.findOne({ id: channelID });
+            if (!userDB) {
+                const channelEmote = await channelEmotes(channelID);
+                const newEmote = new Emote({
+                    name: channel.name,
+                    id: channelID,
+                    StvId: (await StvInfo(channelID)).user.id,
+                    emotes: channelEmote,
+                });
+                await newEmote.save();
+            }
             await client.join(channel.name);
         } // Join all channels in the database
     } catch (err) {
@@ -31,27 +43,6 @@ const initialize = async () => {
 
 client.on('JOIN', async ({ channelName }) => {
     Logger.info(`Joined ${channelName}`);
-    const channelID = (await UserInfo(channelName))[0].id;
-    const userDB = await Emote.findOne({ id: channelID });
-    const ID = userDB?.StvId;
-    if (!ID) {
-        await Emote.findOneAndUpdate(
-            { name: channelName },
-            { StvId: (await StvInfo(channelID)).user.id, id: channelID }
-        );
-    }
-
-    const userDB2 = await Emote.findOne({ id: channelID });
-    if (!userDB2) {
-        const channelEmote = await channelEmotes(channelID);
-        const newEmote = new Emote({
-            name: channelName,
-            id: channelID,
-            StvId: (await StvInfo(channelID)).user.id,
-            emotes: channelEmote,
-        });
-        await newEmote.save();
-    }
 });
 
 client.on('PART', ({ channelName }) => {
