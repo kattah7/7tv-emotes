@@ -49,7 +49,7 @@ export const StvWS = async () => {
                 );
             } else if (d.body.pushed) {
                 const emoteDB = await Emote.findOne({ StvId: d.body.id });
-                const doesEmoteExist = emoteDB?.emotes.find((emote) => emote.emote == d.body.pushed[0].value.id);
+                const doesEmoteExist = emoteDB?.emotes.find((emote: any) => emote.emote == d.body.pushed[0].value.id);
                 if (!doesEmoteExist) {
                     emoteDB?.emotes.push({
                         name: d.body.pushed[0].value.name,
