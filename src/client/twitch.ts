@@ -70,7 +70,7 @@ client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelNam
                 return;
             }
 
-            const isInChannel = await Channels.findOne({ name: username });
+            const isInChannel = await Channels.findOne({ id: ID });
             if (isInChannel) {
                 Logger.info(`Already in ${username}`);
                 return;
