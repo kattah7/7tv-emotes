@@ -38,7 +38,6 @@ export const StvWS = async () => {
         }, 75000);
         if ((timeout as unknown as number) % 2 === 0 || op === 2) {
             clearTimeout(timeout);
-            Logger.info("7TV's WS is still alive");
         }
 
         if (d.body) {
