@@ -1,5 +1,5 @@
 import express from 'express';
-import { client } from '../../client/twitch';
+import { client } from '../../utility/connections';
 import { Emote, Channels } from '../../utility/db';
 import { UserInfo, StvInfo } from '../../utility/parseUID';
 import { channelEmotes } from '../../utility/channelEmotes';

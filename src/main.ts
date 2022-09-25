@@ -1,4 +1,4 @@
-import { initialize } from './client/twitch';
+import { initalize } from './client/twitch';
 import { StvWS } from './utility/stv';
 import { mongoDB } from './utility/db';
 import * as Logger from './utility/logger';
@@ -7,9 +7,9 @@ require('./privateapi/server');
 
 async function init() {
     try {
-        initialize();
-        StvWS();
-        mongoDB();
+        await mongoDB();
+        await initalize();
+        await StvWS();
     } catch (err) {
         Logger.error(err);
     }
