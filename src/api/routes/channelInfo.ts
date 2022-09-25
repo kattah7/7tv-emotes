@@ -19,18 +19,20 @@ router.get('/c/:user', async (req, res) => {
         });
     }
 
-    const emotesMapped = channelEmotes.emotes.map((emote: any) => {
-        return {
-            name: emote.name,
-            emote: emote.emote,
-            usage: emote.usage,
-            isEmote: emote.isEmote,
-            Date: emote.Date,
-        };
-    });
+    const emotesMapped = channelEmotes.emotes.map(
+        (emote: { name: string; emote: string; usage: number; isEmote: boolean; Date: number }) => {
+            return {
+                name: emote.name,
+                emote: emote.emote,
+                usage: emote.usage,
+                isEmote: emote.isEmote,
+                Date: emote.Date,
+            };
+        }
+    );
 
-    const filterEmotesByTrue = emotesMapped.filter((emote: any) => emote.isEmote === true);
-    const mapByTopUsage = filterEmotesByTrue.sort((a, b) => b.usage - a.usage);
+    const filterEmotesByTrue = emotesMapped.filter((emote: { isEmote: boolean }) => emote.isEmote === true);
+    const mapByTopUsage = filterEmotesByTrue.sort((a, b: { usage: number }) => b.usage - a.usage);
     const sliceHundred = mapByTopUsage.slice(0, 100);
 
     return res.status(200).json({

@@ -7,7 +7,7 @@ import { channelEmotes } from '../utility/channelEmotes';
 import * as Logger from '../utility/logger';
 
 async function PRIVMSG() {
-    client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
+    client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
         if (senderUsername === 'kattah') {
             if (messageText.startsWith('!7tvlog')) {
                 const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);

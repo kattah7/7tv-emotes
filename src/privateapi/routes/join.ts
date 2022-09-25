@@ -6,7 +6,7 @@ import { channelEmotes } from '../../utility/channelEmotes';
 import { WS } from '../../utility/stv';
 const router = express.Router();
 
-router.post('/bot/join', async (req: any, res: any) => {
+router.post('/bot/join', async (req: { query: any }, res: { status: any }) => {
     const { username } = req.query;
     if (!username || !/^[A-Z_\d]{2,28}$/i.test(username)) {
         return res.status(400).json({

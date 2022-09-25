@@ -38,7 +38,7 @@ export const StvWS = async () => {
         if (d.body) {
             if (d.body.pulled) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
-                    (emote: any) => emote.emote
+                    (emote: { emote: string }) => emote.emote
                 );
                 if (knownEmoteNames.includes(d.body.pulled[0].old_value.id)) {
                     await Emote.updateOne(
@@ -48,10 +48,10 @@ export const StvWS = async () => {
                 }
             } else if (d.body.pushed) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
-                    (emote: any) => emote.emote
+                    (emote: { emote: string }) => emote.emote
                 );
                 const findThatEmoteByStvID = (await Emote.findOne({ StvId: d.body.id })).emotes.find(
-                    (emote: any) => emote.emote === d.body.pushed[0].value.id
+                    (emote: { emote: string }) => emote.emote === d.body.pushed[0].value.id
                 );
                 if (findThatEmoteByStvID) {
                     if (
@@ -87,7 +87,7 @@ export const StvWS = async () => {
                 }
             } else if (d.body.updated) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
-                    (emote: any) => emote.emote
+                    (emote: { emote: string }) => emote.emote
                 );
                 if (knownEmoteNames.includes(d.body.updated[0].value.id)) {
                     await Emote.updateOne(
