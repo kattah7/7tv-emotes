@@ -26,7 +26,7 @@ const initialize = async () => {
             const userDB = await Emote.findOne({ id: channelID });
             if (!userDB) {
                 const channelEmote = await channelEmotes(channelID);
-                if (!channelEmote) continue;
+                if (channelEmote == null) continue;
                 const newEmote = new Emote({
                     name: channel.name,
                     id: channelID,
