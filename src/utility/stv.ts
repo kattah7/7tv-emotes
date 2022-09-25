@@ -29,30 +29,46 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
+        if (op === 4) {
+            WS.close();
+            WS = new WebSocket(`wss://events.7tv.io/v3`);
+            StvWS();
+            Logger.info("Reconnected to 7TV's WS");
+        }
         if (d.body) {
             if (d.body.pulled) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
                     (emote: any) => emote.emote
                 );
-                for (const emoteID of Object.entries(knownEmoteNames)) {
-                    if (emoteID[1] === d.body.pulled[0].old_value.id) {
-                        await Emote.updateOne(
-                            { 'StvId': d.body.id, 'emotes.emote': d.body.pulled[0].old_value.id },
-                            { $set: { 'emotes.$.isEmote': false } }
-                        );
-                    }
+                if (knownEmoteNames.includes(d.body.pulled[0].old_value.id)) {
+                    await Emote.updateOne(
+                        { 'StvId': d.body.id, 'emotes.emote': d.body.pulled[0].old_value.id },
+                        { $set: { 'emotes.$.isEmote': false } }
+                    );
                 }
             } else if (d.body.pushed) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
                     (emote: any) => emote.emote
                 );
+                const findThatEmoteByStvID = (await Emote.findOne({ StvId: d.body.id })).emotes.find(
+                    (emote: any) => emote.emote === d.body.pushed[0].value.id
+                );
+                if (
+                    knownEmoteNames.includes(d.body.pushed[0].value.id) ||
+                    findThatEmoteByStvID.name !== d.body.pushed[0].value.name
+                ) {
+                    await Emote.updateOne(
+                        { 'StvId': d.body.id, 'emotes.emote': d.body.pushed[0].value.id },
+                        { $set: { 'emotes.$.name': d.body.pushed[0].value.name } }
+                    );
+                }
                 if (knownEmoteNames.includes(d.body.pushed[0].value.id)) {
                     await Emote.updateOne(
                         { 'StvId': d.body.id, 'emotes.emote': d.body.pushed[0].value.id },
                         { $set: { 'emotes.$.isEmote': true } }
                     );
                 } else {
-                    return await Emote.updateOne(
+                    await Emote.updateOne(
                         { StvId: d.body.id },
                         {
                             $push: {
