@@ -53,14 +53,16 @@ export const StvWS = async () => {
                 const findThatEmoteByStvID = (await Emote.findOne({ StvId: d.body.id })).emotes.find(
                     (emote: any) => emote.emote === d.body.pushed[0].value.id
                 );
-                if (
-                    knownEmoteNames.includes(d.body.pushed[0].value.id) ||
-                    findThatEmoteByStvID.name !== d.body.pushed[0].value.name
-                ) {
-                    await Emote.updateOne(
-                        { 'StvId': d.body.id, 'emotes.emote': d.body.pushed[0].value.id },
-                        { $set: { 'emotes.$.name': d.body.pushed[0].value.name } }
-                    );
+                if (findThatEmoteByStvID) {
+                    if (
+                        knownEmoteNames.includes(d.body.pushed[0].value.id) ||
+                        findThatEmoteByStvID.name !== d.body.pushed[0].value.name
+                    ) {
+                        await Emote.updateOne(
+                            { 'StvId': d.body.id, 'emotes.emote': d.body.pushed[0].value.id },
+                            { $set: { 'emotes.$.name': d.body.pushed[0].value.name } }
+                        );
+                    }
                 }
                 if (knownEmoteNames.includes(d.body.pushed[0].value.id)) {
                     await Emote.updateOne(
