@@ -29,12 +29,7 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        if (op === 4) {
-            WS.close();
-            WS = new WebSocket(`wss://events.7tv.io/v3`);
-            StvWS();
-            Logger.info("Reconnected to 7TV's WS");
-        }
+        console.log(op, t, d);
         if (d.body) {
             if (d.body.pulled) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
@@ -95,6 +90,14 @@ export const StvWS = async () => {
                 }
             }
         }
+
+        setInterval(() => {
+            WS.send(
+                JSON.stringify({
+                    op: 37,
+                })
+            );
+        }, 30 * 1000);
     });
 
     WS.on('error', (err) => {
