@@ -18,7 +18,7 @@ router.get('/top', async (req, res) => {
         if (!doesEmoteExist) {
             ifEmoteIdIsSameCombine.push(emote);
         } else {
-            doesEmoteExist.usage += emote.usage;
+            doesEmoteExist.usage += parseInt(emote.usage);
         }
     });
     const emotesMapped = ifEmoteIdIsSameCombine.map((emote: any) => {
