@@ -7,9 +7,9 @@ require('./privateapi/server');
 
 async function init() {
     try {
-        await mongoDB();
-        await initalize();
+        mongoDB();
         await StvWS();
+        await initalize();
     } catch (err) {
         Logger.error(err);
     }

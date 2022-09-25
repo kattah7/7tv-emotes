@@ -7,9 +7,9 @@ let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
     // export function that sends json stringify
-    WS.on('open', async (msg) => {
+    WS.on('open', async (msg: any) => {
         Logger.info('Connected to 7TV', msg);
-        const channels = await Channels.find();
+        const channels = await Channels.find({});
         for (const channel of channels) {
             const stvID = (await StvInfo(channel.id)).user.id;
             if (!stvID) continue;
