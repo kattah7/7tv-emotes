@@ -29,7 +29,12 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        console.log(op, t, d);
+        if (d.count === 100) {
+            WS.close();
+            WS = new WebSocket(`wss://events.7tv.io/v3`);
+            StvWS();
+        }
+
         if (d.body) {
             if (d.body.pulled) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
