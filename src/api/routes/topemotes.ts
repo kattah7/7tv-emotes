@@ -20,6 +20,7 @@ router.get('/top', async (req, res) => {
             doesEmoteExist.usage += Number(emote.usage);
         }
     });
+    ifEmoteIdIsSameCombine.slice(0, 10);
     const emotesMapped = ifEmoteIdIsSameCombine.map((emote: any) => {
         return {
             name: emote.name,
@@ -28,12 +29,10 @@ router.get('/top', async (req, res) => {
         };
     });
 
-    const slice = emotesMapped.slice(0, 10);
-
     return res.status(200).json({
         success: true,
         channels: await Emote.countDocuments(),
-        data: slice,
+        data: emotesMapped,
     });
 });
 
