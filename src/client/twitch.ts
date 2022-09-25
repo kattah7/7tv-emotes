@@ -35,7 +35,7 @@ const initialize = async () => {
                 });
                 await newEmote.save();
             }
-            await client.join(channel.name);
+            client.join(channel.name);
         } // Join all channels in the database
     } catch (err) {
         Logger.error(err);
