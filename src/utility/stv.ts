@@ -29,17 +29,6 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        let timeout: NodeJS.Timeout;
-        timeout = setTimeout(() => {
-            WS.close();
-            WS = new WebSocket(`wss://events.7tv.io/v3`);
-            StvWS();
-            Logger.info("Reconnecting to 7TV's WS");
-        }, 75000);
-        if ((timeout as unknown as number) % 2 === 0 || op === 2) {
-            clearTimeout(timeout);
-        }
-
         if (d.body) {
             if (d.body.pulled) {
                 const knownEmoteNames = (await Emote.findOne({ StvId: d.body.id })).emotes.map(
