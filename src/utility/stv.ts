@@ -29,15 +29,15 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        setInterval(() => {
+        setInterval(async () => {
             try {
                 WS.close();
                 WS = new WebSocket(`wss://events.7tv.io/v3`);
-                StvWS();
+                await StvWS();
             } catch (error) {
                 WS.close();
                 WS = new WebSocket(`wss://events.7tv.io/v3`);
-                StvWS();
+                await StvWS();
             }
         }, 1000 * 60 * 15);
 

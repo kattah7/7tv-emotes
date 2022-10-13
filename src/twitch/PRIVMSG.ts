@@ -79,7 +79,7 @@ async function PRIVMSG() {
             if (knownEmoteNames.has(word)) {
                 const countUserMessages = emotesUsedByName[word] || 0;
                 emotesUsedByName[word] = countUserMessages + 1;
-                if (emotesUsedByName[word] > 10) {
+                if (emotesUsedByName[word] > 16) {
                     Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
                     return;
                 }
