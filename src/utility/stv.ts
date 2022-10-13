@@ -29,11 +29,17 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        if (d.count === 100) {
-            WS.close();
-            WS = new WebSocket(`wss://events.7tv.io/v3`);
-            StvWS();
-        }
+        setInterval(() => {
+            try {
+                WS.close();
+                WS = new WebSocket(`wss://events.7tv.io/v3`);
+                StvWS();
+            } catch (error) {
+                WS.close();
+                WS = new WebSocket(`wss://events.7tv.io/v3`);
+                StvWS();
+            }
+        }, 1000 * 60 * 15);
 
         if (d.body) {
             if (d.body.pulled) {
