@@ -11,10 +11,9 @@ import { bot } from '../../config.json';
 const app = express();
 app.use(morgan('dev'));
 app.use(cors());
-app.use(channelInfo);
-app.use(global);
-app.use(top);
-app.use(join);
+for (const routes of [channelInfo, global, top, join]) {
+    app.use(routes);
+}
 app.listen(bot.port, () => {
     Logger.info('Server is running on port ' + bot.port);
 });

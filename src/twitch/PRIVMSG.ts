@@ -8,7 +8,7 @@ import * as Logger from '../utility/logger';
 
 async function PRIVMSG() {
     client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
-        if (senderUsername === 'kattah') {
+        if (senderUsername === bot.admin) {
             if (messageText.startsWith('!7tvlog')) {
                 const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
                 const username = args[1].toLowerCase();
