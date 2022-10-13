@@ -7,7 +7,7 @@ import { channelEmotes } from '../utility/channelEmotes';
 import * as Logger from '../utility/logger';
 
 async function PRIVMSG() {
-    client.on('PRIVMSG', async ({ senderUsername, messageText, channelID }) => {
+    client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
         if (senderUsername === bot.admin) {
             if (messageText.startsWith('!7tvlog')) {
                 const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
@@ -77,6 +77,13 @@ async function PRIVMSG() {
 
         for (const word of messageText.split(/\s/g)) {
             if (knownEmoteNames.has(word)) {
+                const countUserMessages = emotesUsedByName[word] || 0;
+                emotesUsedByName[word] = countUserMessages + 1;
+                if (emotesUsedByName[word] > 10) {
+                    Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
+                    return;
+                }
+
                 if (!(word in emotesUsedByName)) {
                     emotesUsedByName[word] = 1;
                     continue;
