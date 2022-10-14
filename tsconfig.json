@@ -8,12 +8,12 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "emitDecoratorMetadata": false,
-        "experimentalDecorators": false
+        "experimentalDecorators": false,
     },
     "exclude": [
         "node_modules"
     ],
     "include": [
         "src/**/*"
-    ]
+, "main.ts", "main.ts"]
 }
