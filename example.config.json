@@ -4,6 +4,8 @@
         "admin": "kattah",
         "prefix": "!",
         "port": 5000,
-        "token": "cum"
+        "website": 6700,
+        "token": "cum",
+        "channel": "kattah"
     }
 }
