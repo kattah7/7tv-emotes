@@ -1,6 +1,6 @@
-import { client } from '../utility/connections';
-import { Channels } from '../utility/db';
-import { bot } from '../../config.json';
+import { client } from '../../utility/connections';
+import { Channels } from '../../utility/db';
+import { bot } from '../../../config.json';
 
 async function joinChannels() {
     client.join(bot.channel);

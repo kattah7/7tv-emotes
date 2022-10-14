@@ -1,8 +1,8 @@
-import { client } from '../utility/connections';
-import { Emote } from '../utility/db';
-import { StvInfo, UserInfo } from '../utility/parseUID';
-import { channelEmotes } from '../utility/channelEmotes';
-import * as Logger from '../utility/logger';
+import { client } from '../../utility/connections';
+import { Emote } from '../../utility/db';
+import { StvInfo, UserInfo } from '../../utility/parseUID';
+import { channelEmotes } from '../../utility/channelEmotes';
+import * as Logger from '../../utility/logger';
 
 async function JOIN() {
     client.on('JOIN', async ({ channelName }) => {

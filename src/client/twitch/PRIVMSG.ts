@@ -1,10 +1,10 @@
-import { client } from '../utility/connections';
-import { Emote, Channels } from '../utility/db';
-import { UserInfo, StvInfo } from '../utility/parseUID';
-import { WS } from '../utility/stv';
-import { bot } from '../../config.json';
-import { channelEmotes } from '../utility/channelEmotes';
-import * as Logger from '../utility/logger';
+import { client } from '../../utility/connections';
+import { Emote, Channels } from '../../utility/db';
+import { UserInfo, StvInfo } from '../../utility/parseUID';
+import { WS } from '../../utility/stv';
+import { bot } from '../../../config.json';
+import { channelEmotes } from '../../utility/channelEmotes';
+import * as Logger from '../../utility/logger';
 
 async function PRIVMSG() {
     client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
@@ -77,8 +77,6 @@ async function PRIVMSG() {
 
         for (const word of messageText.split(/\s/g)) {
             if (knownEmoteNames.has(word)) {
-                const countUserMessages = emotesUsedByName[word] || 0;
-                emotesUsedByName[word] = countUserMessages + 1;
                 if (emotesUsedByName[word] > 16) {
                     Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
                     return;
