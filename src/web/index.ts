@@ -6,6 +6,7 @@ import request from 'request';
 import cors from 'cors';
 import { web } from '../../config.json';
 import join from './join';
+import top from './top';
 import * as Logger from '../utility/logger';
 const app = express();
 
@@ -21,7 +22,7 @@ const SESSION_SECRET = web.sessionSecret;
 const CALLBACK_URL = web.callbackURL;
 
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }));
-for (const origin of [passport.session(), passport.initialize(), cors(), join]) {
+for (const origin of [passport.session(), passport.initialize(), cors(), join, top]) {
     app.use(origin);
 }
 
