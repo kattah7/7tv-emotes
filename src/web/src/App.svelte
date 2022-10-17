@@ -25,14 +25,14 @@
             const { display_name, login, id } = data.id.user.data[0];
             const successNav = [
                 { path: '/', text: 'Home' },
-                { path: '/search', text: 'Search' },
+                { path: '/search?', text: 'Search' },
                 { path: `/c/${login}`, text: `${display_name}'s Emotes` },
             ];
             successAuth = successNav;
         } else {
             const navSrc = [
                 { path: '/', text: 'Home' },
-                { path: '/search', text: 'Search' },
+                { path: '/search?', text: 'Search' },
             ];
             fail = navSrc;
         }
@@ -60,7 +60,7 @@
 
     <main>
         <Route path="/"><Home /></Route>
-        <Route path="/search"><Search /></Route>
+        <Route path="/search?"><Search /></Route>
         <Route path="/c/:channel"><Channel /></Route>
     </main>
 </Router>
