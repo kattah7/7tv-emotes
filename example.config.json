@@ -4,8 +4,15 @@
         "admin": "kattah",
         "prefix": "!",
         "port": 5000,
-        "website": 6700,
+        "api": 6969,
         "token": "cum",
         "channel": "kattah"
+    },
+    "web": {
+        "port": 6700,
+        "clientID": "Get it from https://dev.twitch.tv/console/apps",
+        "twitchSecret": "Get it from https://dev.twitch.tv/console/apps",
+        "sessionSecret": "This Can Be a Random String",
+        "callbackURL": "http://localhost:6700/auth/twitch/callback | Add this in your apps, if its testing then localhost, if its production then your domain"
     }
 }

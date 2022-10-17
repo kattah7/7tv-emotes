@@ -2,6 +2,7 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
+import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 
@@ -57,6 +58,7 @@ export default {
             dedupe: ['svelte'],
         }),
         commonjs(),
+        json(),
 
         // In dev mode, call `npm run start` once
         // the bundle has been generated
