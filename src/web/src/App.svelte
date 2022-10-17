@@ -60,7 +60,7 @@
 
     <main>
         <Route path="/"><Home /></Route>
-        <Route path="/search?"><Search /></Route>
+        <Route path="/search"><Search /></Route>
         <Route path="/c/:channel"><Channel /></Route>
     </main>
 </Router>
