@@ -5,13 +5,12 @@ for global emotes use https://api.kattah.me/global
 Ratelimit: rate=1r/s burst=3
 
 git clone  
-make sure to have mongoDB  
-line 19 in src/client/twitch.ts replace "altaccountpoggers" to your chat.  
+cd 7tvemotes  
+make sure to have mongoDB   
 Getting started. change example.config.json to config.json  
 Replace my name with yours  
 Replace port.  
 yarn  
-yarn build  
-node .  
+yarn start  
 !7tvlog "channel"  
 
