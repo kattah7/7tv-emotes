@@ -9,3 +9,10 @@ export async function joinChannel(channel: string) {
     }).then((res) => res.json());
     return join;
 }
+
+const RESTAPI = `http://localhost:${bot.port}`;
+
+export async function getTopEmotes() {
+    const topEmotes = await fetch(`${RESTAPI}/top`).then((res) => res.json());
+    return topEmotes;
+}
