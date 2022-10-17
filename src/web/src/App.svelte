@@ -25,15 +25,11 @@
             const { display_name, login, id } = data.id.user.data[0];
             const successNav = [
                 { path: '/', text: 'Home' },
-                { path: '/search?', text: 'Search' },
                 { path: `/c/${login}`, text: `${display_name}'s Emotes` },
             ];
             successAuth = successNav;
         } else {
-            const navSrc = [
-                { path: '/', text: 'Home' },
-                { path: '/search?', text: 'Search' },
-            ];
+            const navSrc = [{ path: '/', text: 'Home' }];
             fail = navSrc;
         }
         join();
@@ -47,9 +43,11 @@
         <ul class="nav">
             {#if userInfo.success}
                 <Nav data={successAuth} />
+                <a href="/search">Search</a>
                 <a href="/auth/twitch/logout">Logout</a>
             {:else}
                 <Nav data={fail} />
+                <a href="/search">Search</a>
                 <a href="/auth/twitch">Login</a>
             {/if}
         </ul>

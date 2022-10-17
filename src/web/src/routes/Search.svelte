@@ -1,6 +1,7 @@
 <script lang="js">
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('search').addEventListener('submit', (e) => {
+            e.preventDefault();
             const search = document.getElementById('inputChannel').value;
             window.location.href = `/c/${search}`;
         });
