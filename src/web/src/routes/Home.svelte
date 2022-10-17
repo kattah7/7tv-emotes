@@ -1,8 +1,12 @@
 <script lang="ts">
+    import fetch from 'node-fetch';
+
     let globalEmotes = [];
     let channels = [];
     const fetchGlobal = async () => {
-        const { data } = await fetch('https://api.kattah.me/global').then((r) => r.json());
+        const { data } = await fetch('https://api.kattah.me/global', {
+            method: 'GET',
+        }).then((r) => r.json());
         const { global, logging_channels } = data;
         const sortByUsage = global.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
@@ -13,7 +17,9 @@
     let topEmotes = [];
     let topEmotesChannels = [];
     const fetchTopEmotes = async () => {
-        const { data, channels } = await fetch('https://api.kattah.me/top').then((r) => r.json());
+        const { data, channels } = await fetch('https://api.kattah.me/top', {
+            method: 'GET',
+        }).then((r) => r.json());
         const sortByUsage = data.sort((a, b) => b.usage - a.usage);
         topEmotes = sortByUsage;
         topEmotesChannels = channels;

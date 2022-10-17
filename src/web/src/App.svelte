@@ -16,7 +16,9 @@
     let successAuth = [];
     let fail = [];
     const fetchSession = async () => {
-        const res = await fetch('/api/twitch');
+        const res = await fetch('/api/twitch', {
+            method: 'GET',
+        });
         const data = await res.json();
         userInfo = data;
         if (data.success) {
