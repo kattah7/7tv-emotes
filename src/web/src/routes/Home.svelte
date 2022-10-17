@@ -9,7 +9,7 @@
             method: 'GET',
         }).then((r) => r.json());
         const { logging_channels, global } = data;
-        const sortByUsage = global[0].emotes.sort((a, b) => b.usage - a.usage);
+        const sortByUsage = global.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
         channels = logging_channels.toLocaleString();
     };
