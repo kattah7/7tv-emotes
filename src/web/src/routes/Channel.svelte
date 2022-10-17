@@ -2,7 +2,7 @@
     import fetch from 'node-fetch';
 
     let channelEmotes = [];
-    let isSuccess = false;
+    let isSuccess = [];
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const fetchChannelEmotes = async () => {
         const { data, success } = await fetch(`/api/bot/info?channel=${replaceWindow}`, {
@@ -28,7 +28,7 @@
                 <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
             {/each}
         </div>
-    {:else}
+    {:else if !isSuccess}
         <h1>Channel not found, Authorize <a href="/auth/twitch">Here</a> or Ask @Kattah</h1>
     {/if}
 </div>
