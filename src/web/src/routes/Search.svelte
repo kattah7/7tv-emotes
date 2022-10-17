@@ -15,9 +15,6 @@
 <div class="wrap">
     <form class="search" id="search">
         <input type="text" class="searchTerm" id="inputChannel" placeholder="Which channel are you looking for? 🔍" />
-        <button id="search" type="submit" class="searchButton">
-            <i class="fa fa-search" />
-        </button>
     </form>
 </div>
 
@@ -44,18 +41,6 @@
     .searchTerm:focus {
         color: #000000e3;
         font-size: 25px;
-    }
-
-    .searchButton {
-        width: 40px;
-        height: 36px;
-        border: 1px solid #1b9eaf7e;
-        background: #00b4cc91;
-        text-align: center;
-        color: rgb(151, 148, 148);
-        border-radius: 0 5px 5px 0;
-        cursor: pointer;
-        font-size: 20px;
     }
 
     /*Resize the wrap to see the search bar change!*/
