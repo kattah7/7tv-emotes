@@ -4,12 +4,12 @@
     let globalEmotes = [];
     let channels = [];
     const fetchGlobal = async () => {
-        const { data } = await fetch(`https://api.kattah.me/global`, {
+        const { data } = await fetch(`/api/bot/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
-        const { global, logging_channels } = data;
-        const sortByUsage = global.sort((a, b) => b.usage - a.usage);
+        const { logging_channels, global } = data;
+        const sortByUsage = global[0].emotes.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
         channels = logging_channels.toLocaleString();
     };
