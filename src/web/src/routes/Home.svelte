@@ -4,7 +4,7 @@
     let globalEmotes = [];
     let channels = [];
     const fetchGlobal = async () => {
-        const { data } = await fetch(`/api/bot/top`, {
+        const { data } = await fetch(`/api/bot/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
