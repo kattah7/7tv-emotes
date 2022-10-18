@@ -4,7 +4,7 @@
     let globalEmotes = [];
     let channels = [];
     const fetchGlobal = async () => {
-        const { data } = await fetch(`/api/bot/global`, {
+        const { data } = await fetch(`https://api.kattah.me/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
@@ -72,70 +72,127 @@
         margin: 0;
     }
 
-    div.global h3.emote_name,
-    div.top h3.emote_name {
-        position: relative;
-        right: -17%;
-        top: 9%;
-        font-size: 15px;
-        font-family: 'Quicksand';
-    }
-
-    div.global p.emote_usage,
-    div.top p.emote_usage {
-        position: relative;
-        right: -17%;
-        top: 7%;
-        font-size: 15px;
-        font-family: 'Quicksand';
-    }
-
-    div.global h1,
-    div.top h1 {
-        position: relative;
-        font-size: 15px;
-        right: -10px;
-        padding: 0 45px;
-        font-family: 'Quicksand';
-    }
-
-    div.global {
-        transform: translate(5%, 15%);
-        scrollbar-gutter: auto;
-        height: 600px;
-        width: 300px;
-        overflow: auto;
-        background-color: rgb(51, 50, 50);
-        color: white;
-        font-family: arial;
-        padding: 0 20px;
-        max-width: 100%;
-        overflow-x: hidden;
-        border-radius: 20px;
-        border-left: 4px solid gray;
-        margin: 0 35px;
-    }
-
-    div.top {
-        transform: translate(5%, 15%);
-        scrollbar-gutter: auto;
-        height: 600px;
-        width: 300px;
-        overflow: auto;
-        background-color: rgb(51, 50, 50);
-        color: white;
-        font-family: arial;
-        padding: 0 10px 5px 20px;
-        max-width: 100%;
-        overflow-x: hidden;
-        border-radius: 20px;
-        border-left: 4px solid gray;
-        margin: 0 -90px;
-    }
-
     .container {
         max-width: 800px;
         display: flex;
         justify-content: space-between;
+    }
+
+    @media (max-width: 768px) {
+        div.global {
+            transform: translate(50%, 15%);
+            scrollbar-gutter: auto;
+            height: 300px;
+            width: 150px;
+            overflow: auto;
+            background-color: rgb(51, 50, 50);
+            padding: 0 60px 5px 60px;
+            overflow-x: hidden;
+            border-radius: 20px;
+            border-left: 4px solid gray;
+        }
+
+        div.top {
+            transform: translate(-50%, 125%);
+            scrollbar-gutter: auto;
+            height: 300px;
+            width: 160px;
+            overflow: auto;
+            background-color: rgb(51, 50, 50);
+            padding: 0 60px 5px 60px;
+            overflow-x: hidden;
+            border-radius: 20px;
+            border-left: 4px solid gray;
+        }
+
+        div.global h3.emote_name,
+        div.top h3.emote_name {
+            position: relative;
+            top: 18%;
+            font-size: 15px;
+            font-family: 'Quicksand';
+        }
+
+        div.global p.emote_usage,
+        div.top p.emote_usage {
+            position: relative;
+            top: 12%;
+            font-size: 15px;
+            font-family: 'Quicksand';
+        }
+
+        div.global h1,
+        div.top h1 {
+            position: relative;
+            font-size: 15px;
+            right: -10px;
+            padding: 0 60px 5px 60px;
+            font-family: 'Quicksand';
+            margin: 10px -110px;
+        }
+
+        div.global img,
+        div.top img {
+            position: relative;
+            left: -50px;
+            vertical-align: middle;
+        }
+    }
+
+    @media (min-width: 768px) {
+        div.global {
+            transform: translate(5%, 15%);
+            scrollbar-gutter: auto;
+            height: 600px;
+            width: 300px;
+            overflow: auto;
+            background-color: rgb(51, 50, 50);
+            padding: 0 20px;
+            overflow-x: hidden;
+            border-radius: 20px;
+            border-left: 4px solid gray;
+            margin: 0 35px;
+        }
+
+        div.top {
+            transform: translate(5%, 15%);
+            scrollbar-gutter: auto;
+            height: 600px;
+            width: 300px;
+            overflow: auto;
+            background-color: rgb(51, 50, 50);
+            padding: 0 10px 5px 20px;
+            overflow-x: hidden;
+            border-radius: 20px;
+            border-left: 4px solid gray;
+            margin: 0 -90px;
+        }
+
+        div.global h1,
+        div.top h1 {
+            position: relative;
+            font-size: 15px;
+            right: -10px;
+            padding: 0 45px;
+            font-family: 'Quicksand';
+        }
+
+        div.global h3.emote_name,
+        div.top h3.emote_name {
+            position: relative;
+            right: -17%;
+            top: 9%;
+            font-size: 15px;
+            font-family: 'Quicksand';
+        }
+
+        div.global p.emote_usage,
+        div.top p.emote_usage {
+            position: relative;
+            right: -17%;
+            top: 7%;
+            font-size: 15px;
+            font-family: 'Quicksand';
+        }
     }
 </style>

@@ -25,24 +25,6 @@
         display: flex;
     }
 
-    .searchTerm {
-        width: 100%;
-        border: 3px solid #042429a2;
-        border-right: none;
-        padding: 5px;
-        height: 20px;
-        border-radius: 5px 0 0 5px;
-        outline: none;
-        color: #9dbfaf;
-        font-family: 'Quicksand';
-        font-size: 25px;
-    }
-
-    .searchTerm:focus {
-        color: #000000e3;
-        font-size: 25px;
-    }
-
     /*Resize the wrap to see the search bar change!*/
     .wrap {
         width: 30%;
@@ -50,5 +32,53 @@
         top: 20%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+
+    @media (max-width: 768px) {
+        .searchTerm {
+            width: 100%;
+            border: 3px solid #042429a2;
+            border-right: none;
+            padding: 5px;
+            height: 20px;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            color: #9dbfaf;
+            font-family: 'Quicksand';
+            font-size: 15px;
+        }
+
+        .searchTerm:focus {
+            color: #000000e3;
+            font-size: 15px;
+        }
+
+        .wrap {
+            width: 80%;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    @media (min-width: 768px) {
+        .searchTerm {
+            width: 100%;
+            border: 3px solid #042429a2;
+            border-right: none;
+            padding: 5px;
+            height: 20px;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            color: #9dbfaf;
+            font-family: 'Quicksand';
+            font-size: 25px;
+        }
+
+        .searchTerm:focus {
+            color: #000000e3;
+            font-size: 25px;
+        }
     }
 </style>
