@@ -49,16 +49,26 @@ async function PRIVMSG() {
                         await newEmote.save();
                     }
                     await client.join(username);
-                    const sendWSJSONStringyToSTV = {
+                    const emoteSetUpdate = {
                         op: 35,
                         d: {
                             type: 'emote_set.update',
+                            condition: {
+                                object_id: (await StvInfo(channelID)).emote_set.id,
+                            },
+                        },
+                    };
+                    const userUpdate = {
+                        op: 35,
+                        d: {
+                            type: 'user.update',
                             condition: {
                                 object_id: (await StvInfo(channelID)).user.id,
                             },
                         },
                     };
-                    WS.send(JSON.stringify(sendWSJSONStringyToSTV));
+                    WS.send(JSON.stringify(emoteSetUpdate));
+                    WS.send(JSON.stringify(userUpdate));
                     Logger.info('Newly Joined ' + username);
                 } catch (err) {
                     Logger.error(err);

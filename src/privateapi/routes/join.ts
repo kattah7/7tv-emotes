@@ -44,16 +44,26 @@ router.post('/bot/join', async (req: { query: any }, res: { status: any }) => {
                 });
                 await newEmote.save();
             }
-            const sendWSJSONStringyToSTV = {
+            const emoteSetUpdate = {
                 op: 35,
                 d: {
                     type: 'emote_set.update',
+                    condition: {
+                        object_id: (await StvInfo((await UserInfo(username))[0].id)).emote_set.id,
+                    },
+                },
+            };
+            const userUpdate = {
+                op: 35,
+                d: {
+                    type: 'user.update',
                     condition: {
                         object_id: (await StvInfo((await UserInfo(username))[0].id)).user.id,
                     },
                 },
             };
-            WS.send(JSON.stringify(sendWSJSONStringyToSTV));
+            WS.send(JSON.stringify(emoteSetUpdate));
+            WS.send(JSON.stringify(userUpdate));
             await client.join(username);
             return res.status(200).json({
                 success: true,
