@@ -3,15 +3,17 @@
 
     let globalEmotes = [];
     let channels = [];
+    let sinceTracking = '';
     const fetchGlobal = async () => {
-        const { data } = await fetch(`/api/bot/global`, {
+        const { data } = await fetch(`https://api.kattah.me/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
-        const { logging_channels, global } = data;
+        const { logging_since: since, logging_channels, global } = data;
         const sortByUsage = global.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
         channels = logging_channels.toLocaleString();
+        sinceTracking = since;
     };
     fetchGlobal();
 
@@ -44,7 +46,9 @@
 
 <div class="container">
     <div class="global">
-        <h1 id="global-channel-count">Global Emotes, Tracking {channels} Channels</h1>
+        <h1 id="global-channel-count">
+            Global Emotes, Tracking {channels} Channels <br /> Since {sinceTracking.split('T')[0]}
+        </h1>
         {#each globalEmotes as emotes}
             <h3 class="emote_name">{emotes.name}</h3>
             <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
@@ -70,6 +74,11 @@
 
     h1 {
         margin: 0;
+    }
+
+    img {
+        width: 40px;
+        height: 40px;
     }
 
     .container {

@@ -23,9 +23,12 @@
         <div class="channel">
             <h1 id="channel-emote-count">{replaceWindow}'s Emotes</h1>
             {#each channelEmotes as emotes}
-                <h3 class="emote_name">{emotes.name}</h3>
-                <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
-                <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+                <h3 class="emote_name">{emotes.name ?? `Emote not found`}</h3>
+                <p class="emote_usage">{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
+                <p class="emote_date">
+                    Added at<br />{new Date(emotes.Date).toLocaleDateString('en-US') ?? `Emote not found`}
+                </p>
+                <img class="emote_image" src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
             {/each}
         </div>
     {:else if !isSuccess}
@@ -43,18 +46,31 @@
         margin: 0;
     }
 
+    img.emote_image {
+        width: 40px;
+        height: 40px;
+    }
+
     div.channel h3.emote_name {
         position: relative;
-        right: -17%;
-        top: 9%;
+        right: -20%;
+        top: 15%;
         font-size: 15px;
         font-family: 'Quicksand';
     }
 
     div.channel p.emote_usage {
         position: relative;
-        right: -17%;
-        top: 7%;
+        right: -20%;
+        top: 13%;
+        font-size: 15px;
+        font-family: 'Quicksand';
+    }
+
+    div.channel p.emote_date {
+        position: relative;
+        right: -70%;
+        top: 6%;
         font-size: 15px;
         font-family: 'Quicksand';
     }
