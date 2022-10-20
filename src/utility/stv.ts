@@ -26,7 +26,7 @@ export const StvWS = async () => {
         const channels = await Channels.find({});
         for (const channel of channels) {
             const { emote_set, user } = await StvInfo(channel.id);
-            if (!emote_set.id && !user) continue;
+            if (!emote_set.id && !user.id) continue;
             sendWS(35, 'user.update', user.id);
             sendWS(35, 'emote_set.update', emote_set.id);
         }
@@ -127,6 +127,7 @@ export const StvWS = async () => {
             StvWS();
         }, 1000);
     });
-
+    
     return WS;
 };
+
