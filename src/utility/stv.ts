@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import * as Logger from './logger';
 import { Emote, Channels } from '../utility/db';
 import { StvInfo } from '../utility/parseUID';
+import fetch from 'node-fetch';
 
 let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
@@ -35,42 +36,46 @@ export const StvWS = async () => {
         const { op, t, d } = JSON.parse(data);
         switch (d.type) {
             case 'emote_set.update': {
-                const { id } = d.body.actor.connections[0];
+                const { id: emoteSetID } = d.body;
+                const getEmoteSet = await fetch(`https://7tv.io/v3/emote-sets/${emoteSetID}`, {
+                    method: 'GET',
+                }).then((res) => res.json());
+                const { id } = getEmoteSet.owner;
                 if (d.body.pulled) {
                     const { old_value } = d.body.pulled[0];
-                    const knownEmoteNames = (await Emote.findOne({ id: id })).emotes.map(
+                    const knownEmoteNames = (await Emote.findOne({ StvId: id })).emotes.map(
                         (emote: { emote: string }) => emote.emote
                     );
                     if (knownEmoteNames.includes(old_value.id)) {
                         await Emote.updateOne(
-                            { 'id': id, 'emotes.emote': old_value.id },
+                            { 'StvId': id, 'emotes.emote': old_value.id },
                             { $set: { 'emotes.$.isEmote': false } }
                         );
                     }
                 } else if (d.body.pushed) {
                     const { value } = d.body.pushed[0];
-                    const knownEmoteNames = (await Emote.findOne({ id: id })).emotes.map(
+                    const knownEmoteNames = (await Emote.findOne({ StvId: id })).emotes.map(
                         (emote: { emote: string }) => emote.emote
                     );
-                    const findThatEmoteByStvID = (await Emote.findOne({ id: id })).emotes.find(
+                    const findThatEmoteByStvID = (await Emote.findOne({ StvId: id })).emotes.find(
                         (emote: { emote: string }) => emote.emote === value.id
                     );
                     if (findThatEmoteByStvID) {
                         if (knownEmoteNames.includes(value.id) || findThatEmoteByStvID.name !== value.name) {
                             await Emote.updateOne(
-                                { 'id': id, 'emotes.emote': value.id },
+                                { 'StvId': id, 'emotes.emote': value.id },
                                 { $set: { 'emotes.$.name': value.name } }
                             );
                         }
                     }
                     if (knownEmoteNames.includes(value.id)) {
                         await Emote.updateOne(
-                            { 'id': id, 'emotes.emote': value.id },
+                            { 'StvId': id, 'emotes.emote': value.id },
                             { $set: { 'emotes.$.isEmote': true } }
                         );
                     } else {
                         await Emote.updateOne(
-                            { id: id },
+                            { StvId: id },
                             {
                                 $push: {
                                     emotes: {
@@ -86,12 +91,12 @@ export const StvWS = async () => {
                     }
                 } else if (d.body.updated) {
                     const { value } = d.body.updated[0];
-                    const knownEmoteNames = (await Emote.findOne({ id: id })).emotes.map(
+                    const knownEmoteNames = (await Emote.findOne({ StvId: id })).emotes.map(
                         (emote: { emote: string }) => emote.emote
                     );
                     if (knownEmoteNames.includes(value.id)) {
                         await Emote.updateOne(
-                            { 'id': id, 'emotes.emote': value.id },
+                            { 'StvId': id, 'emotes.emote': value.id },
                             { $set: { 'emotes.$.name': value.name } }
                         );
                     }
