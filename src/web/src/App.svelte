@@ -43,12 +43,20 @@
         <ul class="nav">
             {#if userInfo.success}
                 <Nav data={successAuth} />
-                <a href="/search">Search</a>
-                <a href="/auth/twitch/logout">Logout</a>
+                <li>
+                    <a class="link" href="/search">Search</a>
+                </li>
+                <li>
+                    <a href="/auth/twitch/logout">Logout</a>
+                </li>
             {:else}
                 <Nav data={fail} />
-                <a href="/search">Search</a>
-                <a href="/auth/twitch">Login</a>
+                <li>
+                    <a class="link" href="/search">Search</a>
+                </li>
+                <li>
+                    <a href="/auth/twitch">Login</a>
+                </li>
             {/if}
         </ul>
         <a class="m-l" target="_blank" href="https://github.com/kattah7/7tvemotes">
