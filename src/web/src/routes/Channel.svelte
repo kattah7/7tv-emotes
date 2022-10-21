@@ -5,7 +5,7 @@
     let channelEmotes = [];
     let isSuccess = [];
 
-    let WS = new WebSocket(`wss://localhost:${bot.websocket}`);
+    let WS = new WebSocket(`ws://localhost:${bot.websocket}`);
     const replaceWindow = window.location.pathname.replace('/c/', '');
 
     function sendWS(type, data) {
