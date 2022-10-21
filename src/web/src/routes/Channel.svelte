@@ -43,10 +43,10 @@
                 if (emote.name === emoteName) {
                     const findThatEmote = document.getElementById(emoteName);
                     const realUsage = emote.usage + count;
-                    findThatEmote.innerHTML = realUsage + count;
                     for (let i = 0; i < channelEmotes.length; i++) {
                         if (channelEmotes[i].name === emoteName) {
-                            channelEmotes[i].usage = realUsage;
+                            findThatEmote.innerHTML = realUsage + count;
+                            channelEmotes[i].usage = realUsage.toLocaleString();
                         }
                     }
                 }
