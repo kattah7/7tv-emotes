@@ -1,17 +1,58 @@
 <script>
     import fetch from 'node-fetch';
+    import { bot } from '../../../../config.json';
 
     let channelEmotes = [];
     let isSuccess = [];
+
+    let WS = new WebSocket(`ws://localhost:${bot.websocket}`);
     const replaceWindow = window.location.pathname.replace('/c/', '');
-    const fetchChannelEmotes = async () => {
-        const { data, success } = await fetch(`/api/bot/info?channel=${replaceWindow}`, {
-            method: 'GET',
-        }).then((r) => r.json());
-        channelEmotes = data;
-        isSuccess = success;
+
+    function sendWS(type, data) {
+        WS.send(
+            JSON.stringify({
+                type: type,
+                data: data,
+            })
+        );
+    }
+
+    WS.onopen = () => {
+        console.log(`Connected to room ${replaceWindow}`);
+        const fetchChannelEmotes = async () => {
+            const { data, success } = await fetch(`/api/bot/info?channel=${replaceWindow}`, {
+                method: 'GET',
+            }).then((r) => r.json());
+            channelEmotes = data;
+            isSuccess = success;
+
+            if (success) {
+                sendWS('listen', { room: replaceWindow.toLowerCase() });
+            } else {
+                sendWS('error', { room: replaceWindow.toLowerCase() });
+            }
+        };
+        fetchChannelEmotes();
     };
-    fetchChannelEmotes();
+
+    WS.onmessage = ({ type, data }) => {
+        const parsed = JSON.parse(data);
+        const { actor, channel, count, emoteName } = parsed.data;
+        if (count !== null) {
+            channelEmotes.forEach((emote) => {
+                if (emote.name === emoteName) {
+                    const findThatEmote = document.getElementById(emoteName);
+                    const realUsage = emote.usage + count;
+                    findThatEmote.innerHTML = realUsage + count;
+                    for (let i = 0; i < channelEmotes.length; i++) {
+                        if (channelEmotes[i].name === emoteName) {
+                            channelEmotes[i].usage = realUsage;
+                        }
+                    }
+                }
+            });
+        }
+    };
 </script>
 
 <svelte:head>
@@ -24,7 +65,7 @@
             <h1 id="channel-emote-count">{replaceWindow}'s Emotes</h1>
             {#each channelEmotes as emotes}
                 <h3 class="emote_name">{emotes.name ?? `Emote not found`}</h3>
-                <p class="emote_usage">{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
+                <p class="emote_usage" id={emotes.name}>{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
                 <p class="emote_date">
                     Added at<br />{new Date(emotes.Date).toLocaleDateString('en-US') ?? `Emote not found`}
                 </p>
