@@ -6,7 +6,8 @@
         "port": 5000,
         "api": 6969,
         "token": "cum",
-        "channel": "kattah"
+        "channel": "kattah",
+        "websocket": 8080
     },
     "web": {
         "port": 6700,
