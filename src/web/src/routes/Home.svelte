@@ -83,7 +83,7 @@
 
         if (type === 'join') {
             channelCount.forEach((channel) => {
-                channels.push(channel);
+                channels += 1;
             });
         }
     };
