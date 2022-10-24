@@ -21,15 +21,21 @@ export function createSocketServer(server: number) {
 
         ws.on('message', (message: any) => {
             const parsed = JSON.parse(message.toString());
-            console.log(parsed);
             const { type, data } = parsed;
             if (type === 'listen') {
+                // if already listening to channel, ignore
+                if (data in WebSocketNonce) {
+                    sendWS('error', `Already listening to ${data.room}`);
+                    return;
+                }
                 sendWS('response', `You are now connected to ${data.room}`);
 
                 client.on('PRIVMSG', async ({ senderUsername, messageText, channelName }) => {
-                    if (channelName === data.room) {
+                    const isGlobalTop = data.room === 'global:top' ? channelName : data.room;
+
+                    if (channelName === isGlobalTop) {
                         const knownEmoteNames = new Set(
-                            (await Emote.findOne({ name: data.room })).emotes
+                            (await Emote.findOne({ name: isGlobalTop })).emotes
                                 .filter((emote) => emote.isEmote === true)
                                 .map((emote) => emote.name)
                         );

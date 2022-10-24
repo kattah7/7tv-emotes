@@ -1,11 +1,56 @@
-<script lang="ts">
+<script>
     import fetch from 'node-fetch';
+    import { bot } from '../../../../config.json';
+
+    let WS = new WebSocket(bot.wslink);
+
+    function sendWS(type, data) {
+        WS.send(
+            JSON.stringify({
+                type: type,
+                data: data,
+            })
+        );
+    }
+
+    let topEmotes = [];
+    let topEmotesChannels = [];
+
+    WS.onopen = () => {
+        sendWS('listen', { room: 'global:top' });
+        const fetchTopEmotes = async () => {
+            const { data, channels } = await fetch(`/api/bot/top`, {
+                method: 'GET',
+            }).then((r) => r.json());
+            const sortByUsage = data.sort((a, b) => b.usage - a.usage);
+            topEmotes = sortByUsage;
+            topEmotesChannels = channels;
+        };
+        fetchTopEmotes();
+    };
+
+    WS.onmessage = ({ type, data }) => {
+        const parsed = JSON.parse(data);
+        const { actor, channel, count, emoteName } = parsed.data;
+        if (count !== null) {
+            topEmotes.forEach((emote) => {
+                if (emote.name === emoteName) {
+                    const realUsage = parseInt(emote.usage + count);
+                    for (let i = 0; i < topEmotes.length; i++) {
+                        if (topEmotes[i].name === emoteName) {
+                            topEmotes[i].usage = realUsage;
+                        }
+                    }
+                }
+            });
+        }
+    };
 
     let globalEmotes = [];
     let channels = [];
     let sinceTracking = '';
     const fetchGlobal = async () => {
-        const { data } = await fetch(`/api/bot/global`, {
+        const { data } = await fetch(`https://api.kattah.me/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
@@ -16,28 +61,6 @@
         sinceTracking = since;
     };
     fetchGlobal();
-
-    let topEmotes = [];
-    let topEmotesChannels = [];
-    const fetchTopEmotes = async () => {
-        const { data, channels } = await fetch(`/api/bot/top`, {
-            method: 'GET',
-        }).then((r) => r.json());
-        const sortByUsage = data.sort((a, b) => b.usage - a.usage);
-        topEmotes = sortByUsage;
-        topEmotesChannels = channels;
-    };
-    fetchTopEmotes();
-
-    function startLiveUpdate() {
-        setInterval(() => {
-            fetchGlobal();
-        }, 1500);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        startLiveUpdate();
-    });
 </script>
 
 <svelte:head>

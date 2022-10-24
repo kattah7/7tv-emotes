@@ -7,7 +7,8 @@
         "api": 6969,
         "token": "cum",
         "channel": "kattah",
-        "websocket": 8080
+        "websocket": 8080,
+        "wslink": "ws://localhost:8080"
     },
     "web": {
         "port": 6700,
