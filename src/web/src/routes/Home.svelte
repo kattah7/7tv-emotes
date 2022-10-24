@@ -104,7 +104,7 @@
             if (type === 'join') {
                 // update channel count
                 channelCount = parseInt(channelCount + 1);
-                channels = channelCount;
+                channels = channels + channelCount;
             }
         };
     });
