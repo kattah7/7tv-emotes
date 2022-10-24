@@ -53,8 +53,9 @@ export function createSocketServer(server: number) {
                                     usageByName[word] += 1;
                                     continue;
                                 }
+                                
+                                usageByName[word] = 1;
                             }
-                            usageByName[word] = 1;
                         }
 
                         const entries = Object.entries(usageByName);
