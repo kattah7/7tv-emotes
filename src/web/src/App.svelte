@@ -15,7 +15,6 @@
 
     let userInfo = [];
     let successAuth = [];
-    let fail = [];
     const fetchSession = async () => {
         const res = await fetch('/api/twitch', {
             method: 'GET',
@@ -24,14 +23,8 @@
         userInfo = data;
         if (data.success) {
             const { display_name, login, id } = data.id.user.data[0];
-            const successNav = [
-                { path: '/', text: 'Home' },
-                { path: `/c/${login}`, text: `${display_name}'s Emotes` },
-            ];
+            const successNav = [{ path: `/c/${login}`, text: `${display_name}'s Emotes` }];
             successAuth = successNav;
-        } else {
-            const navSrc = [{ path: '/', text: 'Home' }];
-            fail = navSrc;
         }
         join();
     };
@@ -43,6 +36,9 @@
         <img class="logo" alt="logo" src="/7tvM.png" />
         <ul class="nav">
             {#if userInfo.success}
+                <li>
+                    <a class="Home" href="/">Home</a>
+                </li>
                 <Nav data={successAuth} />
                 <li>
                     <a class="link" href="/search">Search</a>
@@ -51,7 +47,9 @@
                     <a href="/auth/twitch/logout">Logout</a>
                 </li>
             {:else}
-                <Nav data={fail} />
+                <li>
+                    <a class="Home" href="/">Home</a>
+                </li>
                 <li>
                     <a class="link" href="/search">Search</a>
                 </li>

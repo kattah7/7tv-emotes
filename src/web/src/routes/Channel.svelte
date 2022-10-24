@@ -1,11 +1,13 @@
 <script>
     import fetch from 'node-fetch';
+    import { bot } from '../../../../config.json';
 
     let channelEmotes = [];
     let isSuccess = [];
 
-    let WS = new WebSocket(`wss://stats-ws.kattah.me`);
+    let WS = new WebSocket(bot.wslink);
     const replaceWindow = window.location.pathname.replace('/c/', '');
+    const channel = replaceWindow.toLowerCase();
 
     function sendWS(type, data) {
         WS.send(
@@ -17,18 +19,18 @@
     }
 
     WS.onopen = () => {
-        console.log(`Connected to room ${replaceWindow}`);
+        console.log(`Connected to room ${channel}`);
         const fetchChannelEmotes = async () => {
-            const { data, success } = await fetch(`/api/bot/info?channel=${replaceWindow}`, {
+            const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
                 method: 'GET',
             }).then((r) => r.json());
             channelEmotes = data;
             isSuccess = success;
 
             if (success) {
-                sendWS('listen', { room: replaceWindow.toLowerCase() });
+                sendWS('listen', { room: channel });
             } else {
-                sendWS('error', { room: replaceWindow.toLowerCase() });
+                sendWS('error', { room: channel });
             }
         };
         fetchChannelEmotes();
