@@ -1,5 +1,4 @@
 <script>
-    import { channel } from 'diagnostics_channel';
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
 
@@ -81,11 +80,11 @@
             });
         }
 
-        if (type === 'join') {
-            channelCount.forEach((channel) => {
-                channels += 1;
-            });
-        }
+        // if (type === 'join') {
+        //     channelCount.forEach((channel) => {
+        //         channels += 1;
+        //     });
+        // }
     };
 
     const fetchTopEmotes = async () => {
