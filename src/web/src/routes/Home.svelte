@@ -18,15 +18,6 @@
 
     WS.onopen = () => {
         sendWS('listen', { room: 'global:top' });
-        const fetchTopEmotes = async () => {
-            const { data, channels } = await fetch(`/api/bot/top`, {
-                method: 'GET',
-            }).then((r) => r.json());
-            const sortByUsage = data.sort((a, b) => b.usage - a.usage);
-            topEmotes = sortByUsage;
-            topEmotesChannels = channels;
-        };
-        fetchTopEmotes();
     };
 
     WS.onmessage = ({ type, data }) => {
@@ -46,21 +37,77 @@
         }
     };
 
+    let globalWS = new WebSocket(bot.wsglobal);
+
+    function sendGlobalWS(type, data) {
+        globalWS.send(
+            JSON.stringify({
+                type: type,
+                data: data,
+            })
+        );
+    }
+
     let globalEmotes = [];
     let channels = [];
     let sinceTracking = '';
+    let channelCount = 0;
+
+    globalWS.onopen = () => {
+        sendGlobalWS('listen', { room: 'global' });
+    };
+
+    globalWS.onmessage = ({ data }) => {
+        const parsed = JSON.parse(data);
+        const {
+            type,
+            data: { emote: emoteName, channel, count, user },
+        } = parsed;
+        if (type === 'emote') {
+            globalEmotes.forEach((emote) => {
+                if (emote.name === emoteName) {
+                    const realUsage = parseInt(emote.usage + count);
+                    for (let i = 0; i < globalEmotes.length; i++) {
+                        if (globalEmotes[i].name === emoteName) {
+                            globalEmotes[i].usage = realUsage;
+                        }
+                    }
+                }
+            });
+        }
+
+        if (type === 'join') {
+            // update channel count
+            channelCount = parseInt(channelCount + 1);
+            channels = channelCount;
+        }
+    };
+
+    const fetchTopEmotes = async () => {
+        const { data, channels } = await fetch(`/api/bot/top`, {
+            method: 'GET',
+        }).then((r) => r.json());
+        const sortByUsage = data.sort((a, b) => b.usage - a.usage);
+        topEmotes = sortByUsage;
+        topEmotesChannels = channels;
+    };
+
     const fetchGlobal = async () => {
-        const { data } = await fetch(`https://api.kattah.me/global`, {
+        const { data } = await fetch(`/api/bot/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
         const { logging_since: since, logging_channels, global } = data;
         const sortByUsage = global.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
-        channels = logging_channels.toLocaleString();
+        channels = logging_channels;
         sinceTracking = since;
     };
-    fetchGlobal();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchTopEmotes();
+        fetchGlobal();
+    });
 </script>
 
 <svelte:head>
@@ -70,7 +117,7 @@
 <div class="container">
     <div class="global">
         <h1 id="global-channel-count">
-            Global Emotes, Tracking {channels} Channels <br /> Since {sinceTracking.split('T')[0]}
+            Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
         </h1>
         {#each globalEmotes as emotes}
             <h3 class="emote_name">{emotes.name}</h3>

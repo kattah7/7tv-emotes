@@ -58,8 +58,8 @@ export function createSocketServer(server: number) {
                         if (Object.entries(emotesUsedByName).length > 0) {
                             for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
                                 sendWS('message', {
-                                    emoteName: emoteName,
-                                    count: count,
+                                    emoteName,
+                                    count,
                                     actor: senderUsername,
                                     channel: channelName,
                                 });

@@ -1,5 +1,4 @@
 import { bot } from './../config.json';
-
 import { initalize } from './client/twitch';
 import { StvWS } from './utility/stv';
 import { mongoDB } from './utility/db';
