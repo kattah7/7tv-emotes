@@ -31,10 +31,10 @@
         sinceTracking = since;
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchTopEmotes();
-        fetchGlobal();
+    fetchTopEmotes();
+    fetchGlobal();
 
+    document.addEventListener('DOMContentLoaded', () => {
         let WS = new WebSocket(bot.wslink);
 
         function sendWS(type, data) {
@@ -103,8 +103,7 @@
 
             if (type === 'join') {
                 // update channel count
-                const countChannels = parseInt(channelCount + 1);
-                channels = countChannels;
+                channels = parseInt(countChannels + 1);
             }
         };
     });
