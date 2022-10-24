@@ -1,6 +1,5 @@
 <script>
     import fetch from 'node-fetch';
-    import { bot } from '../../../../config.json';
 
     let channelEmotes = [];
     let isSuccess = [];

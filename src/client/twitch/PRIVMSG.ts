@@ -79,8 +79,10 @@ async function PRIVMSG() {
 
         const knownEmoteNames = new Set(
             (await Emote.findOne({ id: channelID })).emotes
-                .filter((emote) => emote.isEmote === true)
-                .map((emote) => emote.name)
+                .filter((emote: { isEmote: boolean }) => emote.isEmote === true)
+                .sort((a, b: { usage: number }) => b.usage - a.usage)
+                .slice(0, 100)
+                .map((emote: { name: string }) => emote.name)
         );
 
         const emotesUsedByName = {};
