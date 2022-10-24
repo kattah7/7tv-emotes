@@ -103,7 +103,7 @@
 
             if (type === 'join') {
                 // update channel count
-                channels = parseInt(countChannels + 1);
+                channels = (channelCount + 1).toString();
             }
         };
     });
