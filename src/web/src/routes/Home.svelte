@@ -86,7 +86,7 @@
             const parsed = JSON.parse(data);
             const {
                 type,
-                data: { emote: emoteName, channel, count, user },
+                data: { emote: emoteName, channelCount, count, user },
             } = parsed;
             if (type === 'emote') {
                 globalEmotes.forEach((emote) => {
@@ -102,8 +102,9 @@
             }
 
             if (type === 'join') {
-                // update channel count
-                channels += 1;
+                channelCount.forEach(() => {
+                    channels += 1;
+                });
             }
         };
     });
