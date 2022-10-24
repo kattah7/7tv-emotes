@@ -35,37 +35,37 @@
     fetchGlobal();
 
     document.addEventListener('DOMContentLoaded', () => {
-        // let WS = new WebSocket(bot.wslink);
+        let WS = new WebSocket(bot.wslink);
 
-        // function sendWS(type, data) {
-        //     WS.send(
-        //         JSON.stringify({
-        //             type: type,
-        //             data: data,
-        //         })
-        //     );
-        // }
+        function sendWS(type, data) {
+            WS.send(
+                JSON.stringify({
+                    type: type,
+                    data: data,
+                })
+            );
+        }
 
-        // WS.onopen = () => {
-        //     sendWS('listen', { room: 'global:top' });
-        // };
+        WS.onopen = () => {
+            sendWS('listen', { room: 'global:top' });
+        };
 
-        // WS.onmessage = ({ type, data }) => {
-        //     const parsed = JSON.parse(data);
-        //     const { actor, channel, count, emoteName } = parsed.data;
-        //     if (count !== null) {
-        //         topEmotes.forEach((emote) => {
-        //             if (emote.name === emoteName) {
-        //                 const realUsage = parseInt(emote.usage + count);
-        //                 for (let i = 0; i < topEmotes.length; i++) {
-        //                     if (topEmotes[i].name === emoteName) {
-        //                         topEmotes[i].usage = realUsage;
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-        // };
+        WS.onmessage = ({ type, data }) => {
+            const parsed = JSON.parse(data);
+            const { actor, channel, count, emoteName } = parsed.data;
+            if (count !== null) {
+                topEmotes.forEach((emote) => {
+                    if (emote.name === emoteName) {
+                        const realUsage = parseInt(emote.usage + count);
+                        for (let i = 0; i < topEmotes.length; i++) {
+                            if (topEmotes[i].name === emoteName) {
+                                topEmotes[i].usage = realUsage;
+                            }
+                        }
+                    }
+                });
+            }
+        };
 
         let globalWS = new WebSocket(bot.wsglobal);
 
@@ -86,7 +86,7 @@
             const parsed = JSON.parse(data);
             const {
                 type,
-                data: { emote: emoteName, channel, count, user },
+                data: { emote: emoteName, channelCount, count, user },
             } = parsed;
             if (type === 'emote') {
                 globalEmotes.forEach((emote) => {
@@ -101,9 +101,9 @@
                 });
             }
 
-            if (type === 'join') {
-                channels += 1;
-            }
+            // if (type === 'join') {
+            //     channels += 1;
+            // }
         };
     });
 </script>
@@ -118,6 +118,15 @@
             Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
         </h1>
         {#each globalEmotes as emotes}
+            <h3 class="emote_name">{emotes.name}</h3>
+            <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
+            <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+        {/each}
+    </div>
+
+    <div class="top">
+        <h1>Top Channel Emotes, Tracking {topEmotesChannels} Channels</h1>
+        {#each topEmotes as emotes}
             <h3 class="emote_name">{emotes.name}</h3>
             <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
             <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
