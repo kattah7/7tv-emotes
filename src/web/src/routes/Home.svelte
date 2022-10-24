@@ -10,8 +10,46 @@
     let sinceTracking = '';
 
     document.addEventListener('DOMContentLoaded', () => {
-        fetchTopEmotes();
-        fetchGlobal();
+        let globalWS = new WebSocket(bot.wsglobal);
+
+        function sendGlobalWS(type, data) {
+            globalWS.send(
+                JSON.stringify({
+                    type: type,
+                    data: data,
+                })
+            );
+        }
+
+        globalWS.onopen = () => {
+            sendGlobalWS('listen', { room: 'global' });
+        };
+
+        globalWS.onmessage = ({ data }) => {
+            const parsed = JSON.parse(data);
+            const {
+                type,
+                data: { emote: emoteName, channelCount, count, user },
+            } = parsed;
+            if (type === 'emote') {
+                globalEmotes.forEach((emote) => {
+                    if (emote.name === emoteName) {
+                        const realUsage = parseInt(emote.usage + count);
+                        for (let i = 0; i < globalEmotes.length; i++) {
+                            if (globalEmotes[i].name === emoteName) {
+                                globalEmotes[i].usage = realUsage;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (type === 'join') {
+                channelCount.forEach((channel) => {
+                    channels += 1;
+                });
+            }
+        };
     });
 
     // let WS = new WebSocket(bot.wslink);
@@ -46,47 +84,6 @@
     //     }
     // };
 
-    // let globalWS = new WebSocket(bot.wsglobal);
-
-    // function sendGlobalWS(type, data) {
-    //     globalWS.send(
-    //         JSON.stringify({
-    //             type: type,
-    //             data: data,
-    //         })
-    //     );
-    // }
-
-    // globalWS.onopen = () => {
-    //     sendGlobalWS('listen', { room: 'global' });
-    // };
-
-    // globalWS.onmessage = ({ data }) => {
-    //     const parsed = JSON.parse(data);
-    //     const {
-    //         type,
-    //         data: { emote: emoteName, channelCount, count, user },
-    //     } = parsed;
-    //     if (type === 'emote') {
-    //         globalEmotes.forEach((emote) => {
-    //             if (emote.name === emoteName) {
-    //                 const realUsage = parseInt(emote.usage + count);
-    //                 for (let i = 0; i < globalEmotes.length; i++) {
-    //                     if (globalEmotes[i].name === emoteName) {
-    //                         globalEmotes[i].usage = realUsage;
-    //                     }
-    //                 }
-    //             }
-    //         });
-    //     }
-
-    //     if (type === 'join') {
-    //         channelCount.forEach((channel) => {
-    //             channels += 1;
-    //         });
-    //     }
-    // };
-
     const fetchTopEmotes = async () => {
         const { data, channels } = await fetch(`/api/bot/top`, {
             method: 'GET',
@@ -95,6 +92,7 @@
         topEmotes = sortByUsage;
         topEmotesChannels = channels;
     };
+    fetchTopEmotes();
 
     const fetchGlobal = async () => {
         const { data } = await fetch(`/api/bot/global`, {
@@ -107,6 +105,7 @@
         channels = logging_channels;
         sinceTracking = since;
     };
+    fetchGlobal();
 </script>
 
 <svelte:head>
