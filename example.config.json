@@ -8,7 +8,8 @@
         "token": "cum",
         "channel": "kattah",
         "websocket": 8080,
-        "wslink": "ws://localhost:8080"
+        "wslink": "ws://localhost:8080",
+        "wsglobal": "ws://localhost:7500"
     },
     "web": {
         "port": 6700,

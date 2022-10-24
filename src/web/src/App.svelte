@@ -4,7 +4,6 @@
     import Home from './routes/Home.svelte';
     import Search from './routes/Search.svelte';
     import Channel from './routes/Channel.svelte';
-    import Test from './routes/test.svelte';
 
     async function join() {
         const r = await fetch('/api/bot/join', {
@@ -67,6 +66,5 @@
         <Route path="/"><Home /></Route>
         <Route path="/search"><Search /></Route>
         <Route path="/c/:channel"><Channel /></Route>
-        <Route path="/test"><Test /></Route>
     </main>
 </Router>
