@@ -4,7 +4,7 @@
     let channelEmotes = [];
     let isSuccess = [];
 
-    let WS = new WebSocket(`ws://localhost:9100`);
+    let WS = new WebSocket(`wss://stats-ws.kattah.me`);
     const replaceWindow = window.location.pathname.replace('/c/', '');
 
     function sendWS(type, data) {
