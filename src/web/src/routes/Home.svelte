@@ -2,86 +2,13 @@
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
 
-    let WS = new WebSocket(bot.wslink);
-
-    function sendWS(type, data) {
-        WS.send(
-            JSON.stringify({
-                type: type,
-                data: data,
-            })
-        );
-    }
-
     let topEmotes = [];
     let topEmotesChannels = [];
-
-    WS.onopen = () => {
-        sendWS('listen', { room: 'global:top' });
-    };
-
-    WS.onmessage = ({ type, data }) => {
-        const parsed = JSON.parse(data);
-        const { actor, channel, count, emoteName } = parsed.data;
-        if (count !== null) {
-            topEmotes.forEach((emote) => {
-                if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
-                    for (let i = 0; i < topEmotes.length; i++) {
-                        if (topEmotes[i].name === emoteName) {
-                            topEmotes[i].usage = realUsage;
-                        }
-                    }
-                }
-            });
-        }
-    };
-
-    let globalWS = new WebSocket(bot.wsglobal);
-
-    function sendGlobalWS(type, data) {
-        globalWS.send(
-            JSON.stringify({
-                type: type,
-                data: data,
-            })
-        );
-    }
 
     let globalEmotes = [];
     let channels = [];
     let sinceTracking = '';
     let channelCount = 0;
-
-    globalWS.onopen = () => {
-        sendGlobalWS('listen', { room: 'global' });
-    };
-
-    globalWS.onmessage = ({ data }) => {
-        const parsed = JSON.parse(data);
-        const {
-            type,
-            data: { emote: emoteName, channel, count, user },
-        } = parsed;
-        if (type === 'emote') {
-            globalEmotes.forEach((emote) => {
-                if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
-                    for (let i = 0; i < globalEmotes.length; i++) {
-                        if (globalEmotes[i].name === emoteName) {
-                            globalEmotes[i].usage = realUsage;
-                        }
-                    }
-                }
-            });
-        }
-
-        if (type === 'join') {
-            // update channel count
-            channelCount = parseInt(channelCount + 1);
-            channels = channelCount;
-        }
-    };
 
     const fetchTopEmotes = async () => {
         const { data, channels } = await fetch(`/api/bot/top`, {
@@ -107,6 +34,79 @@
     document.addEventListener('DOMContentLoaded', () => {
         fetchTopEmotes();
         fetchGlobal();
+
+        let WS = new WebSocket(bot.wslink);
+
+        function sendWS(type, data) {
+            WS.send(
+                JSON.stringify({
+                    type: type,
+                    data: data,
+                })
+            );
+        }
+
+        WS.onopen = () => {
+            sendWS('listen', { room: 'global:top' });
+        };
+
+        WS.onmessage = ({ type, data }) => {
+            const parsed = JSON.parse(data);
+            const { actor, channel, count, emoteName } = parsed.data;
+            if (count !== null) {
+                topEmotes.forEach((emote) => {
+                    if (emote.name === emoteName) {
+                        const realUsage = parseInt(emote.usage + count);
+                        for (let i = 0; i < topEmotes.length; i++) {
+                            if (topEmotes[i].name === emoteName) {
+                                topEmotes[i].usage = realUsage;
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        let globalWS = new WebSocket(bot.wsglobal);
+
+        function sendGlobalWS(type, data) {
+            globalWS.send(
+                JSON.stringify({
+                    type: type,
+                    data: data,
+                })
+            );
+        }
+
+        globalWS.onopen = () => {
+            sendGlobalWS('listen', { room: 'global' });
+        };
+
+        globalWS.onmessage = ({ data }) => {
+            const parsed = JSON.parse(data);
+            const {
+                type,
+                data: { emote: emoteName, channel, count, user },
+            } = parsed;
+            if (type === 'emote') {
+                globalEmotes.forEach((emote) => {
+                    if (emote.name === emoteName) {
+                        const realUsage = parseInt(emote.usage + count);
+                        for (let i = 0; i < globalEmotes.length; i++) {
+                            if (globalEmotes[i].name === emoteName) {
+                                globalEmotes[i].usage = realUsage;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (type === 'join') {
+                // update channel count
+                channelCount = parseInt(channelCount + 1);
+                channels = channelCount;
+            }
+        };
     });
 </script>
 
