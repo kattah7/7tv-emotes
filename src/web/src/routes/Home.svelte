@@ -10,7 +10,7 @@
     let sinceTracking = '';
 
     const fetchTopEmotes = async () => {
-        const { data, channels } = await fetch(`https://api.kattah.me/top`, {
+        const { data, channels } = await fetch(`api/bot/top`, {
             method: 'GET',
         }).then((r) => r.json());
         const sortByUsage = data.sort((a, b) => b.usage - a.usage);
