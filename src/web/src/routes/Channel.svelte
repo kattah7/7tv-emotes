@@ -5,6 +5,10 @@
     let channelEmotes = [];
     let isSuccess = [];
 
+    let WS = new WebSocket(bot.wslink);
+    const replaceWindow = window.location.pathname.replace('/c/', '');
+    const channel = replaceWindow.toLowerCase();
+
     const fetchChannelEmotes = async () => {
         const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
             method: 'GET',
@@ -19,10 +23,6 @@
         }
     };
     fetchChannelEmotes();
-
-    let WS = new WebSocket(bot.wslink);
-    const replaceWindow = window.location.pathname.replace('/c/', '');
-    const channel = replaceWindow.toLowerCase();
 
     function sendWS(type, data) {
         WS.send(
