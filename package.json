@@ -11,7 +11,8 @@
     "format": "prettier --check './**/*.{js,ts}'",
     "test": "jest -c .jestrc.js --verbose --passWithNoTests",
     "web:dev": "rollup -c -w",
-    "web:start": "sirv src/web/public --no-clear -s"
+    "web:start": "sirv src/web/public --no-clear -s",
+    "build": "rm -rf build && tsc"
   },
   "license": "MIT",
   "private": false,
