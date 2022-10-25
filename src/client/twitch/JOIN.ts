@@ -33,6 +33,8 @@ async function JOIN() {
                 .filter((emote) => emote.isEmote === true)
                 .map((emote) => emote.name)
         );
+
+        if (knownEmoteNames.size === 0) return;
         fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...knownEmoteNames]));
         Logger.info(`Wrote ${knownEmoteNames.size} emotes to ${id}.json`);
     });

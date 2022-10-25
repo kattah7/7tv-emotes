@@ -19,7 +19,7 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
             await new Emote({
                 name: username,
                 id: userID,
-                stvID: stvID,
+                StvId: stvID,
                 emotes: emotes,
             }).save();
         }
@@ -28,8 +28,18 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
         return;
     }
 
-    async function sendWS(op: number, type: string, stvID: string) {
-        WS.send(JSON.stringify({ op: op, d: { type: type, condition: { object_id: stvID } } }));
+    function sendWS(op: number, type: string, id: string) {
+        WS.send(
+            JSON.stringify({
+                op: op,
+                d: {
+                    type: type,
+                    condition: {
+                        object_id: id,
+                    },
+                },
+            })
+        );
     }
 
     const { username, userid } = req.params;
@@ -49,20 +59,9 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
     }
 
     const channel = await Channels.findOne({ id: userid });
-    const { name } = channel;
-    console.log(channel);
-    if (username != name) {
-        client.part(name);
-        await Channels.updateOne({ id: userid }, { name: username });
-        await Emote.updateOne({ id: userid }, { name: username });
-        await client.join(username);
-        return res.status(400).json({
-            success: false,
-            message: 'name change detected',
-        });
-    }
 
     const { user, emote_set } = STV;
+    console.log(user.id);
     if (!channel) {
         try {
             const channelEmote = await channelEmotes(userid);
@@ -79,6 +78,18 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
                 message: err,
             });
         }
+    }
+
+    const { name } = channel;
+    if (username != name) {
+        client.part(name);
+        await Channels.updateOne({ id: userid }, { name: username });
+        await Emote.updateOne({ id: userid }, { name: username });
+        await client.join(username);
+        return res.status(400).json({
+            success: false,
+            message: 'name change detected',
+        });
     }
 
     return res.status(409).json({

@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import * as Logger from './logger';
 import { Emote } from '../utility/db';
+import fs from 'fs/promises';
 import fetch from 'node-fetch';
 
 const WS = new WebSocket(`wss://events.7tv.io/v3`);
@@ -32,7 +33,9 @@ export const StvWS = async () => {
                 const getEmoteSet = await fetch(`https://7tv.io/v3/emote-sets/${emoteSetID}`, {
                     method: 'GET',
                 }).then((res) => res.json());
+
                 const { id } = getEmoteSet.owner;
+
                 if (d.body.pulled) {
                     const { old_value } = d.body.pulled[0];
                     const knownEmoteNames = (await Emote.findOne({ StvId: id })).emotes.map(
@@ -93,6 +96,16 @@ export const StvWS = async () => {
                         );
                     }
                 }
+
+                const { connections } = await fetch(`https://7tv.io/v3/users/${id}`, {
+                    method: 'GET',
+                }).then((res) => res.json());
+                const knownEmoteNames = new Set(
+                    (await Emote.findOne({ id: connections[0].id })).emotes
+                        .filter((emote) => emote.isEmote === true)
+                        .map((emote) => emote.name)
+                );
+                fs.writeFile(`./src/stats/${connections[0].id}.json`, JSON.stringify([...knownEmoteNames]));
                 break;
             }
 

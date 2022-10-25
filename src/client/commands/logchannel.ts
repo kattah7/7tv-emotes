@@ -22,7 +22,7 @@ module.exports = {
                 await new Emote({
                     name: username,
                     id: userID,
-                    stvID: stvID,
+                    StvId: stvID,
                     emotes: emotes,
                 }).save();
             }
@@ -31,8 +31,18 @@ module.exports = {
             return;
         }
 
-        async function sendWS(op: number, type: string, stvID: string) {
-            WS.send(JSON.stringify({ op: op, d: { type: type, condition: { object_id: stvID } } }));
+        function sendWS(op: number, type: string, id: string) {
+            WS.send(
+                JSON.stringify({
+                    op: op,
+                    d: {
+                        type: type,
+                        condition: {
+                            object_id: id,
+                        },
+                    },
+                })
+            );
         }
 
         if (!args[0]) {
@@ -54,7 +64,7 @@ module.exports = {
             };
         }
 
-        const { error } = await StvInfo(id);
+        const { error, emote_set, user } = await StvInfo(id);
         if (error) {
             return {
                 error: `7TV Error: ${error}`,
@@ -71,8 +81,8 @@ module.exports = {
         try {
             const emotes = await channelEmotes(id);
             await saveChannels(username, id, (await StvInfo(id)).user.id, emotes);
-            sendWS(35, 'emote_set.update', (await StvInfo(id)).emote_set.id);
-            sendWS(35, 'user.update', (await StvInfo(id)).user.id);
+            sendWS(35, 'emote_set.update', emote_set.id);
+            sendWS(35, 'user.update', user.id);
             return;
         } catch (e) {
             return {
