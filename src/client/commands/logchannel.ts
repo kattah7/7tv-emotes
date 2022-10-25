@@ -81,8 +81,6 @@ module.exports = {
         try {
             const emotes = await channelEmotes(id);
             await saveChannels(username, id, (await StvInfo(id)).user.id, emotes);
-            sendWS(35, 'emote_set.update', emote_set.id);
-            sendWS(35, 'user.update', user.id);
             return;
         } catch (e) {
             return {

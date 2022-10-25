@@ -66,8 +66,6 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
         try {
             const channelEmote = await channelEmotes(userid);
             await saveChannels(username, userid, user.id, channelEmote);
-            sendWS(35, 'emote_set.update', emote_set.id);
-            sendWS(35, 'user.update', user.id);
             return res.status(200).json({
                 success: true,
                 message: `Joined ${username}`,
