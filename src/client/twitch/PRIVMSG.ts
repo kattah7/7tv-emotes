@@ -54,7 +54,7 @@ async function PRIVMSG() {
                 pull.aliases.forEach((alias: any) => aliases.set(alias, pull.name));
         }
 
-        const prefix = '!';
+        const prefix = bot.prefix;
         if (!messageText.startsWith(prefix)) return;
         const args = messageText.slice(prefix.length).trim().split(/ +/g);
         const params = {};
