@@ -5,6 +5,21 @@
     let channelEmotes = [];
     let isSuccess = [];
 
+    const fetchChannelEmotes = async () => {
+        const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
+            method: 'GET',
+        }).then((r) => r.json());
+        channelEmotes = data;
+        isSuccess = success;
+
+        if (success) {
+            sendWS('listen', { room: channel });
+        } else {
+            sendWS('error', { room: channel });
+        }
+    };
+    fetchChannelEmotes();
+
     let WS = new WebSocket(bot.wslink);
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const channel = replaceWindow.toLowerCase();
@@ -20,20 +35,6 @@
 
     WS.onopen = () => {
         console.log(`Connected to room ${channel}`);
-        const fetchChannelEmotes = async () => {
-            const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
-                method: 'GET',
-            }).then((r) => r.json());
-            channelEmotes = data;
-            isSuccess = success;
-
-            if (success) {
-                sendWS('listen', { room: channel });
-            } else {
-                sendWS('error', { room: channel });
-            }
-        };
-        fetchChannelEmotes();
     };
 
     WS.onmessage = ({ type, data }) => {
