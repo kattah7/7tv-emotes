@@ -26,7 +26,6 @@ export const StvWS = async () => {
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
-        console.log(d);
         switch (d.type) {
             case 'emote_set.update': {
                 const { id: emoteSetID } = d.body;
