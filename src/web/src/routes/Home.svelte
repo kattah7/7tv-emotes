@@ -91,7 +91,7 @@
     fetchTopEmotes();
 
     const fetchGlobal = async () => {
-        const { data } = await fetch(`/api/bot/global`, {
+        const { data } = await fetch(`https://api.kattah.me/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
