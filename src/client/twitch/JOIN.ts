@@ -9,13 +9,6 @@ async function JOIN() {
     client.on('JOIN', async ({ channelName }) => {
         Logger.info(`Joined ${channelName}`);
         const userID = (await UserInfo(channelName))[0].id;
-        const knownEmoteNames = new Set(
-            (await Emote.findOne({ id: userID })).emotes
-                .filter((emote) => emote.isEmote === true)
-                .map((emote) => emote.name)
-        );
-        fs.writeFile(`./src/stats/${userID}.json`, JSON.stringify([...knownEmoteNames]));
-        Logger.info(`Wrote ${knownEmoteNames.size} emotes to ${userID}.json`);
         if (!(await Emote.findOne({ id: userID }))) {
             const channelEmote = await channelEmotes(userID);
             if (channelEmote == null) {
@@ -35,6 +28,14 @@ async function JOIN() {
                 Logger.error(err);
             }
         }
+
+        const knownEmoteNames = new Set(
+            (await Emote.findOne({ id: userID })).emotes
+                .filter((emote) => emote.isEmote === true)
+                .map((emote) => emote.name)
+        );
+        fs.writeFile(`./src/stats/${userID}.json`, JSON.stringify([...knownEmoteNames]));
+        Logger.info(`Wrote ${knownEmoteNames.size} emotes to ${userID}.json`);
     });
 }
 

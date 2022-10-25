@@ -3,14 +3,16 @@ import { JOIN } from './twitch/JOIN';
 import { PART } from './twitch/PART';
 import { PRIVMSG } from './twitch/PRIVMSG';
 import { joinChannels } from './twitch/joinChannels';
+import * as Logger from '../utility/logger';
 
 const initalize = async () => {
     for (const execute of [JOIN, PART, joinChannels]) {
         await execute();
     }
-    setInterval(() => {
+    setTimeout(() => {
+        Logger.info('PRIVMSG initalized');
         PRIVMSG();
-    }, 60000);
+    }, 10000);
 };
 
 export { client, initalize };
