@@ -77,45 +77,45 @@ async function PRIVMSG() {
             }
         }
 
-        const knownEmoteNames = new Set(
-            (await Emote.findOne({ id: channelID })).emotes
-                .filter((emote: { isEmote: boolean }) => emote.isEmote === true)
-                .sort((a, b: { usage: number }) => b.usage - a.usage)
-                .slice(0, 100)
-                .map((emote: { name: string }) => emote.name)
-        );
+        // const knownEmoteNames = new Set(
+        //     (await Emote.findOne({ id: channelID })).emotes
+        //         .filter((emote: { isEmote: boolean }) => emote.isEmote === true)
+        //         .sort((a, b: { usage: number }) => b.usage - a.usage)
+        //         .slice(0, 100)
+        //         .map((emote: { name: string }) => emote.name)
+        // );
 
-        const emotesUsedByName = {};
+        // const emotesUsedByName = {};
 
-        for (const word of messageText.split(/\s/g)) {
-            if (knownEmoteNames.has(word)) {
-                if (emotesUsedByName[word] > 16) {
-                    Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
-                    return;
-                }
+        // for (const word of messageText.split(/\s/g)) {
+        //     if (knownEmoteNames.has(word)) {
+        //         if (emotesUsedByName[word] > 16) {
+        //             Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
+        //             return;
+        //         }
 
-                if (!(word in emotesUsedByName)) {
-                    emotesUsedByName[word] = 1;
-                    continue;
-                }
-            }
-            ++emotesUsedByName[word];
-        }
+        //         if (!(word in emotesUsedByName)) {
+        //             emotesUsedByName[word] = 1;
+        //             continue;
+        //         }
+        //     }
+        //     ++emotesUsedByName[word];
+        // }
 
-        if (Object.entries(emotesUsedByName).length > 0) {
-            const operation = Emote.collection.initializeUnorderedBulkOp();
-            for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-                operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
-                    $inc: { 'emotes.$.usage': count },
-                });
-            }
+        // if (Object.entries(emotesUsedByName).length > 0) {
+        //     const operation = Emote.collection.initializeUnorderedBulkOp();
+        //     for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
+        //         operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
+        //             $inc: { 'emotes.$.usage': count },
+        //         });
+        //     }
 
-            try {
-                await operation.execute();
-            } catch (err) {
-                Logger.error(err);
-            }
-        }
+        //     try {
+        //         await operation.execute();
+        //     } catch (err) {
+        //         Logger.error(err);
+        //     }
+        // }
     });
 }
 
