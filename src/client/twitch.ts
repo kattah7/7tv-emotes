@@ -12,7 +12,7 @@ const initalize = async () => {
     setTimeout(() => {
         Logger.info('PRIVMSG initalized');
         PRIVMSG();
-    }, 10000);
+    }, 15000);
 };
 
 export { client, initalize };
