@@ -5,9 +5,12 @@ import { PRIVMSG } from './twitch/PRIVMSG';
 import { joinChannels } from './twitch/joinChannels';
 
 const initalize = async () => {
-    for (const execute of [JOIN, PART, PRIVMSG, joinChannels]) {
+    for (const execute of [JOIN, PART, joinChannels]) {
         await execute();
     }
+    setInterval(() => {
+        PRIVMSG();
+    }, 60000);
 };
 
 export { client, initalize };
