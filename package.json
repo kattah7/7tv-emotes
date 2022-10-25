@@ -12,7 +12,7 @@
     "test": "jest -c .jestrc.js --verbose --passWithNoTests",
     "web:dev": "rollup -c -w",
     "web:start": "sirv src/web/public --no-clear -s",
-    "build": "rm -rf build && tsc"
+    "build": "rm -rf build && tsc && rollup -c && cp -r src/web/public build/src/web"
   },
   "license": "MIT",
   "private": false,

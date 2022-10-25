@@ -4,10 +4,10 @@ import { StvWS } from './utility/stv';
 import { mongoDB } from './utility/db';
 import { createSocketServer } from './websocket/socket';
 import * as Logger from './utility/logger';
-// require('./web');
+require('./web');
 require('./api/server');
 require('./privateapi/server');
-// createSocketServer(bot.websocket);
+createSocketServer(bot.websocket);
 
 async function init() {
     try {
