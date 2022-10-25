@@ -7,6 +7,42 @@ import * as Logger from '../../utility/logger';
 async function PRIVMSG() {
     client.on('PRIVMSG', async (msg) => {
         const { senderUsername, messageText, channelID, channelName, senderUserID } = msg;
+        const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
+        const parse = JSON.parse(getChannelEmotes);
+        const knownEmoteNames = new Set(parse);
+
+        const emotesUsedByName = {};
+
+        for (const word of messageText.split(/\s/g)) {
+            if (knownEmoteNames.has(word)) {
+                if (emotesUsedByName[word] > 16) {
+                    Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
+                    return;
+                }
+
+                if (!(word in emotesUsedByName)) {
+                    emotesUsedByName[word] = 1;
+                    continue;
+                }
+            }
+            ++emotesUsedByName[word];
+        }
+
+        if (Object.entries(emotesUsedByName).length > 0) {
+            const operation = Emote.collection.initializeUnorderedBulkOp();
+            for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
+                operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
+                    $inc: { 'emotes.$.usage': count },
+                });
+            }
+
+            try {
+                await operation.execute();
+            } catch (err) {
+                Logger.error(err);
+            }
+        }
+
         const commands = new Map();
         const aliases = new Map();
         const cooldown = new Map();
@@ -65,42 +101,6 @@ async function PRIVMSG() {
             }
         } catch (e) {
             Logger.error(e);
-        }
-
-        const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
-        const parse = JSON.parse(getChannelEmotes);
-        const knownEmoteNames = new Set(parse);
-
-        const emotesUsedByName = {};
-
-        for (const word of messageText.split(/\s/g)) {
-            if (knownEmoteNames.has(word)) {
-                if (emotesUsedByName[word] > 16) {
-                    Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
-                    return;
-                }
-
-                if (!(word in emotesUsedByName)) {
-                    emotesUsedByName[word] = 1;
-                    continue;
-                }
-            }
-            ++emotesUsedByName[word];
-        }
-
-        if (Object.entries(emotesUsedByName).length > 0) {
-            const operation = Emote.collection.initializeUnorderedBulkOp();
-            for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-                operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
-                    $inc: { 'emotes.$.usage': count },
-                });
-            }
-
-            try {
-                await operation.execute();
-            } catch (err) {
-                Logger.error(err);
-            }
         }
     });
 }
