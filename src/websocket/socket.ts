@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { client } from './../utility/connections';
-import { Emote, Channels } from './../utility/db';
+import { Emote } from './../utility/db';
 import * as Logger from './../utility/logger';
 
 export function createSocketServer(server: number) {
@@ -9,10 +9,10 @@ export function createSocketServer(server: number) {
         port: server,
     });
 
-    let WebSocketNonce = {};
+    const WebSocketNonce = {};
 
     wss.on('connection', (ws: any, req: any) => {
-        let nonce = req.headers['sec-websocket-key'];
+        const nonce = req.headers['sec-websocket-key'];
         WebSocketNonce[nonce] = ws;
 
         function sendWS(type: string, data: any) {
@@ -29,8 +29,10 @@ export function createSocketServer(server: number) {
                     return;
                 }
                 sendWS('response', `You are now connected to ${data.room}`);
-                client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
+
+                client.on('PRIVMSG', async ({ senderUsername, messageText, channelName }) => {
                     const isGlobalTop = data.room === 'global:top' ? channelName : data.room;
+
                     if (channelName === isGlobalTop) {
                         const knownEmoteNames = new Set(
                             (await Emote.findOne({ name: isGlobalTop })).emotes
@@ -38,30 +40,33 @@ export function createSocketServer(server: number) {
                                 .map((emote) => emote.name)
                         );
 
-                        const emotesUsedByName = {};
+                        const usageByName = {};
 
-                        for (const word of messageText.split(/\s/g)) {
+                        for (const word of messageText.split(' ')) {
                             if (knownEmoteNames.has(word)) {
-                                if (emotesUsedByName[word] > 16) {
+                                if (usageByName[word] > 16) {
                                     sendWS('message', 'Spamming emotes');
                                     return;
                                 }
 
-                                if (!(word in emotesUsedByName)) {
-                                    emotesUsedByName[word] = 1;
+                                if (word in usageByName) {
+                                    usageByName[word] += 1;
                                     continue;
                                 }
+                                
+                                usageByName[word] = 1;
                             }
-                            ++emotesUsedByName[word];
                         }
 
-                        if (Object.entries(emotesUsedByName).length > 0) {
-                            for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
+                        const entries = Object.entries(usageByName);
+
+                        if (entries.length) {
+                            for (const [emoteName, count] of entries) {
                                 sendWS('message', {
-                                    emoteName,
                                     count,
-                                    actor: senderUsername,
+                                    emoteName,
                                     channel: channelName,
+                                    actor: senderUsername,
                                 });
                             }
                         }
@@ -71,3 +76,5 @@ export function createSocketServer(server: number) {
         });
     });
 }
+
+
