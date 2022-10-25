@@ -1,82 +1,72 @@
 import { client } from '../../utility/connections';
-import { Emote, Channels } from '../../utility/db';
-import { UserInfo, StvInfo } from '../../utility/parseUID';
-import { WS } from '../../utility/stv';
+import { Emote } from '../../utility/db';
 import { bot } from '../../../config.json';
-import { channelEmotes } from '../../utility/channelEmotes';
-import fs from 'fs';
+import fs, { readdirSync } from 'fs';
 import * as Logger from '../../utility/logger';
 
 async function PRIVMSG() {
-    client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
-        if (senderUsername === bot.admin) {
-            if (messageText.startsWith('!7tvlog')) {
-                const args = messageText.slice(bot.prefix.length).trim().split(/ +/g);
-                const username = args[1].toLowerCase();
-                const ID = await UserInfo(username);
-                if (ID == null) {
-                    Logger.error('User not found');
-                    return;
-                }
-                const STV = await StvInfo(ID[0]['id']);
-                if (STV.error) {
-                    Logger.error(`7TV Error: ${STV.error}`);
-                    return;
-                }
+    client.on('PRIVMSG', async (msg) => {
+        const { senderUsername, messageText, channelID, channelName, senderUserID } = msg;
+        const commands = new Map();
+        const aliases = new Map();
+        const cooldown = new Map();
 
-                const isInChannel = await Channels.findOne({ id: ID[0]['id'] });
-                if (isInChannel) {
-                    Logger.warn(`Already in ${username}`);
-                    return;
-                }
-
-                try {
-                    const channel = new Channels({
-                        name: username,
-                        id: (await UserInfo(username))[0].id,
-                        Date: Date.now(),
-                    });
-                    await channel.save();
-                    const channelID = (await UserInfo(username))[0].id;
-                    const userDB2 = await Emote.findOne({ id: channelID });
-                    if (!userDB2) {
-                        const channelEmote = await channelEmotes(channelID);
-                        const newEmote = new Emote({
-                            name: username,
-                            id: channelID,
-                            StvId: (await StvInfo(channelID)).user.id,
-                            emotes: channelEmote,
-                        });
-                        await newEmote.save();
-                    }
-                    await client.join(username);
-                    const emoteSetUpdate = {
-                        op: 35,
-                        d: {
-                            type: 'emote_set.update',
-                            condition: {
-                                object_id: (await StvInfo(channelID)).emote_set.id,
-                            },
-                        },
-                    };
-                    const userUpdate = {
-                        op: 35,
-                        d: {
-                            type: 'user.update',
-                            condition: {
-                                object_id: (await StvInfo(channelID)).user.id,
-                            },
-                        },
-                    };
-                    WS.send(JSON.stringify(emoteSetUpdate));
-                    WS.send(JSON.stringify(userUpdate));
-                    Logger.info('Newly Joined ' + username);
-                } catch (err) {
-                    Logger.error(err);
-                }
-                return;
-            }
+        for (let file of readdirSync('./build/src/client/commands').filter((file) => file.endsWith('.js'))) {
+            let pull = require(`../../client/commands/${file}`);
+            commands.set(pull.name, pull);
+            if (pull.aliases && Array.isArray(pull.aliases))
+                pull.aliases.forEach((alias: any) => aliases.set(alias, pull.name));
         }
+
+        const prefix = '!';
+        if (!messageText.startsWith(prefix)) return;
+        const args = messageText.slice(prefix.length).trim().split(/ +/g);
+        const params = {};
+        args.filter((word) => word.includes(':')).forEach((param) => {
+            const [key, value] = param.split(':');
+            params[key] = value === 'true' || value === 'false' ? value === 'true' : value;
+        });
+        const cmd = args.length > 0 ? args.shift().toLowerCase() : '';
+        if (cmd.length == 0) return;
+
+        let command = commands.get(cmd);
+        if (!command && !aliases.get(cmd)) return;
+        if (!command) command = commands.get(aliases.get(cmd));
+
+        try {
+            if (command) {
+                if (senderUsername !== bot.admin) {
+                    return;
+                }
+
+                if (command.cooldown) {
+                    if (cooldown.has(`${command.name}${senderUserID}`)) return;
+                    cooldown.set(`${command.name}${senderUserID}`, Date.now() + command.cooldown);
+                    setTimeout(() => {
+                        cooldown.delete(`${command.name}${senderUserID}`);
+                    }, command.cooldown);
+                }
+
+                const response = await command.execute(msg, args, client, params);
+
+                if (response) {
+                    const { error, warn, text } = response;
+                    if (error) {
+                        Logger.error(error);
+                        setTimeout(() => {
+                            cooldown.delete(`${command.name}${senderUserID}`);
+                        }, 5000);
+                    } else if (warn) {
+                        Logger.warn(warn);
+                    } else if (text) {
+                        Logger.info(text);
+                    }
+                }
+            }
+        } catch (e) {
+            Logger.error(e);
+        }
+
         const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
         const parse = JSON.parse(getChannelEmotes);
         const knownEmoteNames = new Set(parse);
