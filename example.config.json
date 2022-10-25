@@ -9,7 +9,8 @@
         "channel": "kattah",
         "websocket": 8080,
         "wslink": "ws://localhost:8080",
-        "wsglobal": "ws://localhost:7500"
+        "wsglobal": "ws://localhost:7500",
+        "mongo": "mongodb://127.0.0.1:27017/stv"
     },
     "web": {
         "port": 6700,
