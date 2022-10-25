@@ -1,7 +1,6 @@
 import WebSocket from 'ws';
 import * as Logger from './logger';
-import { Emote, Channels } from '../utility/db';
-import { StvInfo } from '../utility/parseUID';
+import { Emote } from '../utility/db';
 import fetch from 'node-fetch';
 
 const WS = new WebSocket(`wss://events.7tv.io/v3`);
@@ -23,17 +22,11 @@ export const StvWS = async () => {
     // export function that sends json stringify
     WS.on('open', async (msg: any) => {
         Logger.info('Connected to 7TV', msg);
-        const channels = await Channels.find({});
-        for (const channel of channels) {
-            const { emote_set, user } = await StvInfo(channel.id);
-            if (!emote_set.id && !user.id) continue;
-            sendWS(35, 'user.update', user.id);
-            sendWS(35, 'emote_set.update', emote_set.id);
-        }
     });
 
     WS.on('message', async (data: any) => {
         const { op, t, d } = JSON.parse(data);
+        console.log(d);
         switch (d.type) {
             case 'emote_set.update': {
                 const { id: emoteSetID } = d.body;
