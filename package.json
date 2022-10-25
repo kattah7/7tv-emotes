@@ -3,16 +3,15 @@
   "version": "1.0.0",
   "main": "build/src/main.js",
   "scripts": {
-    "start": "rollup -c && ts-node src/main.ts",
     "dev": "rollup -c && nodemon --watch src --exec \"ts-node\" src/main.ts",
-    "watch": "tsc -w",
     "lint": "eslint './**/*.{js,ts}'",
     "lint:fix": "eslint './**/*.{js,ts}' --fix",
     "format": "prettier --check './**/*.{js,ts}'",
     "test": "jest -c .jestrc.js --verbose --passWithNoTests",
     "web:dev": "rollup -c -w",
     "web:start": "sirv src/web/public --no-clear -s",
-    "build": "rm -rf build && tsc && rollup -c && cp -r src/web/public build/src/web"
+    "build": "rm -rf build && tsc && rollup -c && cp -r src/web/public build/src/web",
+    "web": "node build/src/web/index.js"
   },
   "license": "MIT",
   "private": false,
