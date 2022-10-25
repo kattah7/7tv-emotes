@@ -27,12 +27,20 @@
         );
     }
 
-    WS.onopen = () => {
+    async function UserInfo(username) {
+        if (!username) return null;
+        const Data = await fetch(`https://api.ivr.fi/v2/twitch/user?login=${username}`).then((res) => res.json());
+        if (Data.length === 0) return null;
+        return Data;
+    }
+
+    WS.onopen = async () => {
         console.log(`Connected to room ${channel}`);
+        const userID = (await UserInfo(channel))[0].id;
         if (isSuccess) {
-            sendWS('listen', { room: channel });
+            sendWS('listen', { room: userID });
         } else {
-            sendWS('error', { room: channel });
+            sendWS('error', { room: userID });
         }
     };
 

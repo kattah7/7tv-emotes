@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { client } from './../utility/connections';
-import { Emote, Channels } from './../utility/db';
+import { Emote } from './../utility/db';
+import fs from 'fs';
 import * as Logger from './../utility/logger';
 
 export function createSocketServer(server: number) {
@@ -30,13 +31,11 @@ export function createSocketServer(server: number) {
                 }
                 sendWS('response', `You are now connected to ${data.room}`);
                 client.on('PRIVMSG', async ({ senderUsername, messageText, channelID, channelName }) => {
-                    const isGlobalTop = data.room === 'global:top' ? channelName : data.room;
-                    if (channelName === isGlobalTop) {
-                        const knownEmoteNames = new Set(
-                            (await Emote.findOne({ name: isGlobalTop })).emotes
-                                .filter((emote) => emote.isEmote === true)
-                                .map((emote) => emote.name)
-                        );
+                    const isGlobalTop = data.room === 'global:top' ? channelID : data.room;
+                    if (channelID === isGlobalTop) {
+                        const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
+                        const parse = JSON.parse(getChannelEmotes);
+                        const knownEmoteNames = new Set(parse);
 
                         const emotesUsedByName = {};
 

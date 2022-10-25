@@ -4,6 +4,7 @@ import { UserInfo, StvInfo } from '../../utility/parseUID';
 import { WS } from '../../utility/stv';
 import { bot } from '../../../config.json';
 import { channelEmotes } from '../../utility/channelEmotes';
+import fs from 'fs';
 import * as Logger from '../../utility/logger';
 
 async function PRIVMSG() {
@@ -76,14 +77,9 @@ async function PRIVMSG() {
                 return;
             }
         }
-
-        const knownEmoteNames = new Set(
-            (await Emote.findOne({ id: channelID })).emotes
-                .filter((emote: { isEmote: boolean }) => emote.isEmote === true)
-                .sort((a, b: { usage: number }) => b.usage - a.usage)
-                .slice(0, 100)
-                .map((emote: { name: string }) => emote.name)
-        );
+        const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
+        const parse = JSON.parse(getChannelEmotes);
+        const knownEmoteNames = new Set(parse);
 
         const emotesUsedByName = {};
 
