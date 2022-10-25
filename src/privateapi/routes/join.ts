@@ -3,7 +3,6 @@ import { client } from '../../utility/connections';
 import { Emote, Channels } from '../../utility/db';
 import { StvInfo } from '../../utility/parseUID';
 import { channelEmotes } from '../../utility/channelEmotes';
-import { WS } from '../../utility/stv';
 const router = express.Router();
 
 router.post('/bot/join/:username/:userid', async (req: { query: any; params: any }, res: { status: any }) => {
@@ -23,23 +22,7 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
                 emotes: emotes,
             }).save();
         }
-
-        client.join(username);
         return;
-    }
-
-    function sendWS(op: number, type: string, id: string) {
-        WS.send(
-            JSON.stringify({
-                op: op,
-                d: {
-                    type: type,
-                    condition: {
-                        object_id: id,
-                    },
-                },
-            })
-        );
     }
 
     const { username, userid } = req.params;
@@ -61,11 +44,11 @@ router.post('/bot/join/:username/:userid', async (req: { query: any; params: any
     const channel = await Channels.findOne({ id: userid });
 
     const { user, emote_set } = STV;
-    console.log(user.id);
     if (!channel) {
         try {
             const channelEmote = await channelEmotes(userid);
             await saveChannels(username, userid, user.id, channelEmote);
+            client.join(username);
             return res.status(200).json({
                 success: true,
                 message: `Joined ${username}`,

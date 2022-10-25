@@ -26,23 +26,7 @@ module.exports = {
                     emotes: emotes,
                 }).save();
             }
-
-            client.join(username);
             return;
-        }
-
-        function sendWS(op: number, type: string, id: string) {
-            WS.send(
-                JSON.stringify({
-                    op: op,
-                    d: {
-                        type: type,
-                        condition: {
-                            object_id: id,
-                        },
-                    },
-                })
-            );
         }
 
         if (!args[0]) {
@@ -81,6 +65,7 @@ module.exports = {
         try {
             const emotes = await channelEmotes(id);
             await saveChannels(username, id, (await StvInfo(id)).user.id, emotes);
+            client.join(username);
             return;
         } catch (e) {
             return {
