@@ -1,22 +1,46 @@
 import express from 'express';
 import { client } from '../../utility/connections';
 import { Emote, Channels } from '../../utility/db';
-import { UserInfo, StvInfo } from '../../utility/parseUID';
+import { StvInfo } from '../../utility/parseUID';
 import { channelEmotes } from '../../utility/channelEmotes';
 import { WS } from '../../utility/stv';
 const router = express.Router();
 
-router.post('/bot/join', async (req: { query: any }, res: { status: any }) => {
-    const { username } = req.query;
-    if (!username || !/^[A-Z_\d]{2,28}$/i.test(username)) {
+router.post('/bot/join/:username/:userid', async (req: { query: any; params: any }, res: { status: any }) => {
+    async function saveChannels(username: string, userID: string, stvID: string, emotes: any) {
+        await new Channels({
+            name: username,
+            id: userID,
+            Date: Date.now(),
+        }).save();
+
+        const emoteDB = await Emote.findOne({ id: userID });
+        if (!emoteDB) {
+            await new Emote({
+                name: username,
+                id: userID,
+                stvID: stvID,
+                emotes: emotes,
+            }).save();
+        }
+
+        client.join(username);
+        return;
+    }
+
+    async function sendWS(op: number, type: string, stvID: string) {
+        WS.send(JSON.stringify({ op: op, d: { type: type, condition: { object_id: stvID } } }));
+    }
+
+    const { username, userid } = req.params;
+    if (!userid) {
         return res.status(400).json({
             success: false,
             message: 'malformed username parameter',
         });
     }
 
-    const ID = (await UserInfo(username))[0].id;
-    const STV = await StvInfo(ID);
+    const STV = await StvInfo(userid);
     if (STV.error) {
         return res.status(400).json({
             success: false,
@@ -24,47 +48,27 @@ router.post('/bot/join', async (req: { query: any }, res: { status: any }) => {
         });
     }
 
-    const channel = await Channels.findOne({ name: username });
+    const channel = await Channels.findOne({ id: userid });
+    const { name } = channel;
+    console.log(channel);
+    if (username != name) {
+        client.part(name);
+        await Channels.updateOne({ id: userid }, { name: username });
+        await Emote.updateOne({ id: userid }, { name: username });
+        await client.join(username);
+        return res.status(400).json({
+            success: false,
+            message: 'name change detected',
+        });
+    }
+
+    const { user, emote_set } = STV;
     if (!channel) {
         try {
-            const newChannel = new Channels({
-                name: username,
-                id: (await UserInfo(username))[0].id,
-                Date: Date.now(),
-            });
-            await newChannel.save();
-            const emoteDB = await Emote.findOne({ id: (await UserInfo(username))[0].id });
-            if (!emoteDB) {
-                const channelEmote = await channelEmotes((await UserInfo(username))[0].id);
-                const newEmote = new Emote({
-                    name: username,
-                    id: (await UserInfo(username))[0].id,
-                    StvId: (await StvInfo((await UserInfo(username))[0].id)).user.id,
-                    emotes: channelEmote,
-                });
-                await newEmote.save();
-            }
-            const emoteSetUpdate = {
-                op: 35,
-                d: {
-                    type: 'emote_set.update',
-                    condition: {
-                        object_id: (await StvInfo((await UserInfo(username))[0].id)).emote_set.id,
-                    },
-                },
-            };
-            const userUpdate = {
-                op: 35,
-                d: {
-                    type: 'user.update',
-                    condition: {
-                        object_id: (await StvInfo((await UserInfo(username))[0].id)).user.id,
-                    },
-                },
-            };
-            WS.send(JSON.stringify(emoteSetUpdate));
-            WS.send(JSON.stringify(userUpdate));
-            await client.join(username);
+            const channelEmote = await channelEmotes(userid);
+            await saveChannels(username, userid, user.id, channelEmote);
+            sendWS(35, 'emote_set.update', emote_set.id);
+            sendWS(35, 'user.update', user.id);
             return res.status(200).json({
                 success: true,
                 message: `Joined ${username}`,
