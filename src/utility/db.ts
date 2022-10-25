@@ -1,9 +1,10 @@
 import DB from 'mongoose';
+import { bot } from './../../config.json';
 import * as Logger from './logger';
 
 const mongoDB = () => {
     try {
-        DB.connect(`mongodb://127.0.0.1:27017/stv`, {});
+        DB.connect(bot.mongo, {});
     } catch (err) {
         Logger.error(err);
     }
