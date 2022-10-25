@@ -5,11 +5,7 @@
     let channelEmotes = [];
     let isSuccess = [];
 
-<<<<<<< HEAD
-    let WS = new WebSocket(bot.wslink);
-=======
     let WS = new WebSocket(`wss://stats-ws.kattah.me`);
->>>>>>> parent of c885990... fixed emote doubling, added parseint
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const channel = replaceWindow.toLowerCase();
 
