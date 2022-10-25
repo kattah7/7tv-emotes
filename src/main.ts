@@ -7,7 +7,7 @@ import * as Logger from './utility/logger';
 require('./web');
 require('./api/server');
 require('./privateapi/server');
-createSocketServer(bot.websocket);
+// createSocketServer(bot.websocket);
 
 async function init() {
     try {
