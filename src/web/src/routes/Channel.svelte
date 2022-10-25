@@ -5,7 +5,11 @@
     let channelEmotes = [];
     let isSuccess = [];
 
+<<<<<<< HEAD
     let WS = new WebSocket(bot.wslink);
+=======
+    let WS = new WebSocket(`wss://stats-ws.kattah.me`);
+>>>>>>> parent of c885990... fixed emote doubling, added parseint
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const channel = replaceWindow.toLowerCase();
 
@@ -42,7 +46,9 @@
         if (count !== null) {
             channelEmotes.forEach((emote) => {
                 if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
+                    const findThatEmote = document.getElementById(emoteName);
+                    const realUsage = emote.usage + count;
+                    findThatEmote.innerHTML = realUsage + count;
                     for (let i = 0; i < channelEmotes.length; i++) {
                         if (channelEmotes[i].name === emoteName) {
                             channelEmotes[i].usage = realUsage;
