@@ -15,6 +15,7 @@ async function JOIN() {
                 .map((emote) => emote.name)
         );
         fs.writeFile(`./src/stats/${userID}.json`, JSON.stringify([...knownEmoteNames]));
+        Logger.info(`Wrote ${knownEmoteNames.size} emotes to ${userID}.json`);
         if (!(await Emote.findOne({ id: userID }))) {
             const channelEmote = await channelEmotes(userID);
             if (channelEmote == null) {
