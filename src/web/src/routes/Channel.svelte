@@ -15,12 +15,6 @@
         }).then((r) => r.json());
         channelEmotes = data;
         isSuccess = success;
-
-        if (success) {
-            sendWS('listen', { room: channel });
-        } else {
-            sendWS('error', { room: channel });
-        }
     };
     fetchChannelEmotes();
 
@@ -35,6 +29,11 @@
 
     WS.onopen = () => {
         console.log(`Connected to room ${channel}`);
+        if (isSuccess) {
+            sendWS('listen', { room: channel });
+        } else {
+            sendWS('error', { room: channel });
+        }
     };
 
     WS.onmessage = ({ type, data }) => {
