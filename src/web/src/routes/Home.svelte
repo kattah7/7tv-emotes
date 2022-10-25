@@ -9,6 +9,29 @@
     let channels = [];
     let sinceTracking = '';
 
+    const fetchTopEmotes = async () => {
+        const { data, channels } = await fetch(`/api/bot/top`, {
+            method: 'GET',
+        }).then((r) => r.json());
+        const sortByUsage = data.sort((a, b) => b.usage - a.usage);
+        topEmotes = sortByUsage;
+        topEmotesChannels = channels;
+    };
+    fetchTopEmotes();
+
+    const fetchGlobal = async () => {
+        const { data } = await fetch(`https://api.kattah.me/global`, {
+            // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
+            method: 'GET',
+        }).then((r) => r.json());
+        const { logging_since: since, logging_channels, global } = data;
+        const sortByUsage = global.sort((a, b) => b.usage - a.usage);
+        globalEmotes = sortByUsage;
+        channels = logging_channels;
+        sinceTracking = since;
+    };
+    fetchGlobal();
+
     document.addEventListener('DOMContentLoaded', () => {
         let globalWS = new WebSocket(bot.wsglobal);
         function sendGlobalWS(type, data) {
@@ -77,29 +100,6 @@
             }
         };
     });
-
-    const fetchTopEmotes = async () => {
-        const { data, channels } = await fetch(`/api/bot/top`, {
-            method: 'GET',
-        }).then((r) => r.json());
-        const sortByUsage = data.sort((a, b) => b.usage - a.usage);
-        topEmotes = sortByUsage;
-        topEmotesChannels = channels;
-    };
-    fetchTopEmotes();
-
-    const fetchGlobal = async () => {
-        const { data } = await fetch(`https://api.kattah.me/global`, {
-            // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
-            method: 'GET',
-        }).then((r) => r.json());
-        const { logging_since: since, logging_channels, global } = data;
-        const sortByUsage = global.sort((a, b) => b.usage - a.usage);
-        globalEmotes = sortByUsage;
-        channels = logging_channels;
-        sinceTracking = since;
-    };
-    fetchGlobal();
 </script>
 
 <svelte:head>
