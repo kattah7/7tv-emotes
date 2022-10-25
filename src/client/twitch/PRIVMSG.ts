@@ -102,20 +102,20 @@ async function PRIVMSG() {
             ++emotesUsedByName[word];
         }
 
-        if (Object.entries(emotesUsedByName).length > 0) {
-            const operation = Emote.collection.initializeUnorderedBulkOp();
-            for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-                operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
-                    $inc: { 'emotes.$.usage': count },
-                });
-            }
+        // if (Object.entries(emotesUsedByName).length > 0) {
+        //     const operation = Emote.collection.initializeUnorderedBulkOp();
+        //     for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
+        //         operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
+        //             $inc: { 'emotes.$.usage': count },
+        //         });
+        //     }
 
-            try {
-                await operation.execute();
-            } catch (err) {
-                Logger.error(err);
-            }
-        }
+        //     try {
+        //         await operation.execute();
+        //     } catch (err) {
+        //         Logger.error(err);
+        //     }
+        // }
     });
 }
 
