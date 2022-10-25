@@ -4,7 +4,7 @@ import { Emote, Channels } from '../utility/db';
 import { StvInfo } from '../utility/parseUID';
 import fetch from 'node-fetch';
 
-let WS = new WebSocket(`wss://events.7tv.io/v3`);
+const WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
     function sendWS(op: number, type: string, id: string) {
@@ -127,7 +127,6 @@ export const StvWS = async () => {
             StvWS();
         }, 1000);
     });
-    
+
     return WS;
 };
-

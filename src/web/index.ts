@@ -28,7 +28,7 @@ for (const origin of [passport.session(), passport.initialize(), cors(), join, t
     app.use(origin);
 }
 
-OAuth2Strategy.prototype.userProfile = function (accessToken, done) {
+OAuth2Strategy.prototype.userProfile = function (accessToken: string, done) {
     const options = {
         url: 'https://api.twitch.tv/helix/users',
         method: 'GET',

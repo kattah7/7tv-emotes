@@ -10,10 +10,10 @@ export function createSocketServer(server: number) {
         port: server,
     });
 
-    let WebSocketNonce = {};
+    const WebSocketNonce = {};
 
     wss.on('connection', (ws: any, req: any) => {
-        let nonce = req.headers['sec-websocket-key'];
+        const nonce = req.headers['sec-websocket-key'];
         WebSocketNonce[nonce] = ws;
 
         function sendWS(type: string, data: any) {
