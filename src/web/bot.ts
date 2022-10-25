@@ -3,8 +3,8 @@ import { bot } from '../../config.json';
 
 const HOSTNAME = `http://localhost:${bot.api}`;
 
-export async function joinChannel(channel: string) {
-    const join = await fetch(`${HOSTNAME}/bot/join?username=${channel}`, {
+export async function joinChannel(channel: string, id: string) {
+    const join = await fetch(`${HOSTNAME}/bot/join/${channel}/${id}`, {
         method: 'POST',
     }).then((res) => res.json());
     return join;
