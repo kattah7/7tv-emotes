@@ -35,16 +35,12 @@ export const StvWS = async () => {
                 Logger.info('Reconnecting to 7TV');
                 WS.close();
                 WS = new WebSocket(`wss://events.7tv.io/v3`);
-                StvWS();
-
-                const everyChannelID = (await Channels.find()).map((channel) => channel.id);
-                everyChannelID.forEach(async (id) => {
-                    const { user, emote_set } = await StvInfo(id);
-                    sendWS(36, 'user.update', user.id);
-                    sendWS(36, 'emote_set.update', emote_set.id);
-                    await new Promise<void>((resolve) => {
-                        WS.on('open', () => {
-                            resolve();
+                await new Promise<void>((resolve) => {
+                    WS.on('open', async () => {
+                        resolve();
+                        const everyChannelID = (await Channels.find()).map((channel) => channel.id);
+                        everyChannelID.forEach(async (id) => {
+                            const { user, emote_set } = await StvInfo(id);
                             sendWS(35, 'user.update', user.id);
                             sendWS(35, 'emote_set.update', emote_set.id);
                         });
