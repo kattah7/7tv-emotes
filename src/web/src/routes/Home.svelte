@@ -112,9 +112,13 @@
             Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
         </h1>
         {#each globalEmotes as emotes}
-            <h3 class="emote_name">{emotes.name}</h3>
+            <h3 class="emote_name">
+                {emotes.name.length > 16 ? emotes.name.substring(0, 12) + '. . .' : emotes.name ?? 'Emote not found'}
+            </h3>
             <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
-            <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+            <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
+                <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+            </a>
         {/each}
     </div>
 
@@ -123,7 +127,9 @@
         {#each topEmotes as emotes}
             <h3 class="emote_name">{emotes.name}</h3>
             <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
-            <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+            <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
+                <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+            </a>
         {/each}
     </div>
 </div>
