@@ -33,22 +33,23 @@ export const StvWS = async () => {
         setTimeout(async () => {
             if (op !== 2) {
                 Logger.info('Reconnecting to 7TV');
-                WS.close();
-                WS = new WebSocket(`wss://events.7tv.io/v3`);
-                await StvWS();
-                await new Promise<void>((resolve) => {
-                    WS.on('open', async () => {
-                        resolve();
-                        const everyChannelID = (await Channels.find()).map((channel) => channel.id);
-                        everyChannelID.forEach(async (id) => {
-                            const { user, emote_set } = await StvInfo(id);
-                            sendWS(35, 'user.update', user.id);
-                            sendWS(35, 'emote_set.update', emote_set.id);
-                        });
-                    });
-                });
+                process.exit(0);
+                // WS.close();
+                // WS = new WebSocket(`wss://events.7tv.io/v3`);
+                // await StvWS();
+                // await new Promise<void>((resolve) => {
+                //     WS.on('open', async () => {
+                //         resolve();
+                //         const everyChannelID = (await Channels.find()).map((channel) => channel.id);
+                //         everyChannelID.forEach(async (id) => {
+                //             const { user, emote_set } = await StvInfo(id);
+                //             sendWS(35, 'user.update', user.id);
+                //             sendWS(35, 'emote_set.update', emote_set.id);
+                //         });
+                //     });
+                // });
             }
-        }, 80000);
+        }, 1000 * 60 * 10);
 
         switch (d.type) {
             case 'emote_set.update': {
