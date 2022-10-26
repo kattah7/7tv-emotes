@@ -8,8 +8,8 @@ import fetch from 'node-fetch';
 let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
-    function sendWS(op: number, type: string, id: string) {
-        WS.send(
+    async function sendWS(op: number, type: string, id: string) {
+        await WS.send(
             JSON.stringify({
                 op: op,
                 d: {
