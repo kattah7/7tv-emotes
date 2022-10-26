@@ -46,10 +46,11 @@ export const StvWS = async () => {
                 const everyChannelID = (await Channels.find()).map((channel) => channel.id);
                 everyChannelID.forEach(async (id) => {
                     const { user, emote_set } = await StvInfo(id);
+                    sendWS(36, 'user.update', user.id);
+                    sendWS(36, 'emote_set.update', emote_set.id);
                     sendWS(35, 'user.update', user.id);
                     sendWS(35, 'emote_set.update', emote_set.id);
                 });
-                return;
             }
         }, 80000);
 
