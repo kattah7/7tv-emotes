@@ -1,10 +1,11 @@
 import WebSocket from 'ws';
 import * as Logger from './logger';
-import { Emote } from '../utility/db';
+import { Emote, Channels } from '../utility/db';
+import { StvInfo } from '../utility/parseUID';
 import fs from 'fs/promises';
 import fetch from 'node-fetch';
 
-const WS = new WebSocket(`wss://events.7tv.io/v3`);
+let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
     function sendWS(op: number, type: string, id: string) {
@@ -26,7 +27,31 @@ export const StvWS = async () => {
     });
 
     WS.on('message', async (data: any) => {
+        console.log(JSON.parse(data));
         const { op, t, d } = JSON.parse(data);
+        // if no op number 2 for 75 seconds then reconnect
+        setTimeout(async () => {
+            if (op !== 2) {
+                Logger.info('Reconnecting to 7TV');
+                WS.close();
+                WS = new WebSocket(`wss://events.7tv.io/v3`);
+                await StvWS();
+
+                await new Promise<void>((resolve) => {
+                    WS.on('open', () => {
+                        resolve();
+                    });
+                });
+
+                const everyChannelID = (await Channels.find()).map((channel) => channel.id);
+                everyChannelID.forEach(async (id) => {
+                    const { user, emote_set } = await StvInfo(id);
+                    sendWS(35, 'user.update', user.id);
+                    sendWS(35, 'emote_set.update', emote_set.id);
+                });
+            }
+        }, 80000);
+
         switch (d.type) {
             case 'emote_set.update': {
                 const { id: emoteSetID } = d.body;
