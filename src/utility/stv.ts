@@ -8,8 +8,8 @@ import fetch from 'node-fetch';
 let WS = new WebSocket(`wss://events.7tv.io/v3`);
 export { WS };
 export const StvWS = async () => {
-    async function sendWS(op: number, type: string, id: string) {
-        await WS.send(
+    function sendWS(op: number, type: string, id: string) {
+        WS.send(
             JSON.stringify({
                 op: op,
                 d: {
@@ -35,21 +35,20 @@ export const StvWS = async () => {
                 Logger.info('Reconnecting to 7TV');
                 WS.close();
                 WS = new WebSocket(`wss://events.7tv.io/v3`);
-                await StvWS();
-
-                await new Promise<void>((resolve) => {
-                    WS.on('open', () => {
-                        resolve();
-                    });
-                });
+                StvWS();
 
                 const everyChannelID = (await Channels.find()).map((channel) => channel.id);
                 everyChannelID.forEach(async (id) => {
                     const { user, emote_set } = await StvInfo(id);
                     sendWS(36, 'user.update', user.id);
                     sendWS(36, 'emote_set.update', emote_set.id);
-                    sendWS(35, 'user.update', user.id);
-                    sendWS(35, 'emote_set.update', emote_set.id);
+                    await new Promise<void>((resolve) => {
+                        WS.on('open', () => {
+                            resolve();
+                            sendWS(35, 'user.update', user.id);
+                            sendWS(35, 'emote_set.update', emote_set.id);
+                        });
+                    });
                 });
             }
         }, 80000);
