@@ -15,11 +15,6 @@ async function PRIVMSG() {
 
         for (const word of messageText.split(/\s/g)) {
             if (knownEmoteNames.has(word)) {
-                if (emotesUsedByName[word] > 16) {
-                    Logger.warn(`${senderUsername} is spamming "${word}" in ${channelName}`);
-                    return;
-                }
-
                 if (!(word in emotesUsedByName)) {
                     emotesUsedByName[word] = 1;
                     continue;
@@ -31,7 +26,9 @@ async function PRIVMSG() {
         if (Object.entries(emotesUsedByName).length > 0) {
             const operation = Emote.collection.initializeUnorderedBulkOp();
             for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-                if (isNaN(Number(count))) continue;
+                if (isNaN(Number(count)) || count < 0) {
+                    continue;
+                }
                 operation.find({ 'id': channelID, 'emotes.name': emoteName, 'emotes.isEmote': true }).update({
                     $inc: { 'emotes.$.usage': count },
                 });
@@ -40,6 +37,9 @@ async function PRIVMSG() {
             try {
                 await operation.execute();
             } catch (err) {
+                if (err.message.includes('Batch cannot be empty')) {
+                    return;
+                }
                 Logger.error(err);
             }
         }
