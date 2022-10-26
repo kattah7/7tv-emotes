@@ -49,6 +49,7 @@ export const StvWS = async () => {
                     sendWS(35, 'user.update', user.id);
                     sendWS(35, 'emote_set.update', emote_set.id);
                 });
+                return;
             }
         }, 80000);
 
