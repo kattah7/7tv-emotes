@@ -34,6 +34,11 @@ async function JOIN() {
                 .map((emote) => emote.name)
         );
 
+        const emoteUsage = (await Emote.findOne({ id: id })).emotes.filter((emote) => isNaN(emote.usage));
+        if (emoteUsage[0]) {
+            await Emote.updateOne({ id: id }, { $pull: { emotes: { usage: { $exists: false } } } });
+            Logger.info(`Removed ${emoteUsage.length} emotes from ${channelName}`);
+        }
         if (knownEmoteNames.size === 0) return;
         fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...knownEmoteNames]));
         Logger.info(`Wrote ${knownEmoteNames.size} emotes to ${id}.json`);

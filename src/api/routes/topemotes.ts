@@ -27,7 +27,7 @@ router.get('/top', async (req, res) => {
         return {
             name: emote.name,
             emote: emote.emote,
-            usage: emote.usage,
+            usage: (emote.usage as number) || 0,
         };
     });
 

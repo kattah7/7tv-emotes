@@ -76,7 +76,7 @@ export const StvWS = async () => {
                                     emotes: {
                                         name: value.name,
                                         emote: value.id,
-                                        usage: 0,
+                                        usage: (1 as number) || 0,
                                         isEmote: true,
                                         Date: Date.now(),
                                     },

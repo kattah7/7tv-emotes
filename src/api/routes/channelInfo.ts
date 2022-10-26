@@ -24,7 +24,7 @@ router.get('/c/:user', async (req, res) => {
             return {
                 name: emote.name,
                 emote: emote.emote,
-                usage: emote.usage,
+                usage: (emote.usage as number) || 0,
                 isEmote: emote.isEmote,
                 Date: emote.Date,
             };

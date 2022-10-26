@@ -31,7 +31,8 @@ async function PRIVMSG() {
         if (Object.entries(emotesUsedByName).length > 0) {
             const operation = Emote.collection.initializeUnorderedBulkOp();
             for (const [emoteName, count] of Object.entries(emotesUsedByName)) {
-                operation.find({ 'id': channelID, 'emotes.name': emoteName }).update({
+                if (isNaN(Number(count))) continue;
+                operation.find({ 'id': channelID, 'emotes.name': emoteName, 'emotes.isEmote': true }).update({
                     $inc: { 'emotes.$.usage': count },
                 });
             }

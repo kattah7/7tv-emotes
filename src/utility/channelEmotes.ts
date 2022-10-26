@@ -6,7 +6,7 @@ const channelEmotes = async (channel: any) => {
     const parsed = await res?.emote_set.emotes.map((emote: { name: string; id: string }) => ({
         name: emote.name,
         emote: emote.id,
-        usage: 0,
+        usage: (1 as number) || 0,
         isEmote: true,
         Date: Date.now(),
     }));
