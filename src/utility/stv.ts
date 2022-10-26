@@ -35,6 +35,7 @@ export const StvWS = async () => {
                 Logger.info('Reconnecting to 7TV');
                 WS.close();
                 WS = new WebSocket(`wss://events.7tv.io/v3`);
+                await StvWS();
                 await new Promise<void>((resolve) => {
                     WS.on('open', async () => {
                         resolve();
