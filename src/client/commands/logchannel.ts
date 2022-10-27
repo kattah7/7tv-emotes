@@ -64,7 +64,7 @@ module.exports = {
 
         try {
             const emotes = await channelEmotes(id);
-            await saveChannels(username, id, (await StvInfo(id)).user.id, emotes);
+            await saveChannels(username, id, user.id, emotes);
             client.join(username);
             return;
         } catch (e) {
