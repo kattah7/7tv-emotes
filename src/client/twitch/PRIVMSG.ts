@@ -1,7 +1,6 @@
 import { client } from '../../utility/connections';
 import { Emote } from '../../utility/db';
-import { bot } from '../../../config.json';
-import fs, { readdirSync } from 'fs';
+import fs from 'fs';
 import * as Logger from '../../utility/logger';
 
 async function PRIVMSG() {
@@ -42,66 +41,6 @@ async function PRIVMSG() {
                 }
                 Logger.error(err);
             }
-        }
-
-        const commands = new Map();
-        const aliases = new Map();
-        const cooldown = new Map();
-
-        for (let file of readdirSync('./build/src/client/commands').filter((file) => file.endsWith('.js'))) {
-            let pull = require(`../../client/commands/${file}`);
-            commands.set(pull.name, pull);
-            if (pull.aliases && Array.isArray(pull.aliases))
-                pull.aliases.forEach((alias: any) => aliases.set(alias, pull.name));
-        }
-
-        const prefix = bot.prefix;
-        if (!messageText.startsWith(prefix)) return;
-        const args = messageText.slice(prefix.length).trim().split(/ +/g);
-        const params = {};
-        args.filter((word) => word.includes(':')).forEach((param) => {
-            const [key, value] = param.split(':');
-            params[key] = value === 'true' || value === 'false' ? value === 'true' : value;
-        });
-        const cmd = args.length > 0 ? args.shift().toLowerCase() : '';
-        if (cmd.length == 0) return;
-
-        let command = commands.get(cmd);
-        if (!command && !aliases.get(cmd)) return;
-        if (!command) command = commands.get(aliases.get(cmd));
-
-        try {
-            if (command) {
-                if (senderUsername !== bot.admin) {
-                    return;
-                }
-
-                if (command.cooldown) {
-                    if (cooldown.has(`${command.name}${senderUserID}`)) return;
-                    cooldown.set(`${command.name}${senderUserID}`, Date.now() + command.cooldown);
-                    setTimeout(() => {
-                        cooldown.delete(`${command.name}${senderUserID}`);
-                    }, command.cooldown);
-                }
-
-                const response = await command.execute(msg, args, client, params);
-
-                if (response) {
-                    const { error, warn, text } = response;
-                    if (error) {
-                        Logger.error(error);
-                        setTimeout(() => {
-                            cooldown.delete(`${command.name}${senderUserID}`);
-                        }, 5000);
-                    } else if (warn) {
-                        Logger.warn(warn);
-                    } else if (text) {
-                        Logger.info(text);
-                    }
-                }
-            }
-        } catch (e) {
-            Logger.error(e);
         }
     });
 }
