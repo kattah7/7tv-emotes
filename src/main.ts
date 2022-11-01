@@ -13,6 +13,10 @@ async function init() {
         for (const func of [mongoDB, initalize]) {
             func();
         }
+
+        setInterval(() => {
+            process.exit(0);
+        }, 1000 * 60 * 30);
     } catch (err) {
         Logger.error(err);
     }
