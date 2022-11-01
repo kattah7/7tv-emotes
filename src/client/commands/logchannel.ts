@@ -1,7 +1,6 @@
 import { UserInfo, StvInfo } from '../../utility/parseUID';
 import { Channels, Emote } from '../../utility/db';
 import { channelEmotes } from '../../utility/channelEmotes';
-import { WS } from '../../utility/stv';
 
 module.exports = {
     name: '7tvlog',

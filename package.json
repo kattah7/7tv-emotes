@@ -22,6 +22,7 @@
     "dotenv": "^16.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
+    "got": "11.8.3",
     "mongodb": "^4.9.1",
     "mongoose": "^6.6.0",
     "morgan": "^1.10.0",
