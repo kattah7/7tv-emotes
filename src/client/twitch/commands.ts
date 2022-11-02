@@ -11,8 +11,8 @@ async function commands() {
         const aliases = new Map();
         const cooldown = new Map();
 
-        for (let file of readdirSync('./build/src/client/commands').filter((file) => file.endsWith('.js'))) {
-            let pull = require(`../../client/commands/${file}`);
+        for (const file of readdirSync('./build/src/client/commands').filter((file) => file.endsWith('.js'))) {
+            const pull = require(`../../client/commands/${file}`);
             commands.set(pull.name, pull);
             if (pull.aliases && Array.isArray(pull.aliases))
                 pull.aliases.forEach((alias: any) => aliases.set(alias, pull.name));
