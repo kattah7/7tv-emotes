@@ -16,7 +16,7 @@ async function init() {
 
         setInterval(() => {
             process.exit(0);
-        }, 1000 * 60 * 30);
+        }, 1000 * 60 * 60 * 2);
     } catch (err) {
         Logger.error(err);
     }
