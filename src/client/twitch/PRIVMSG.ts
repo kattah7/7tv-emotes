@@ -9,10 +9,6 @@ async function PRIVMSG() {
         const getChannelEmotes = fs.readFileSync(`./src/stats/${channelID}.json`, 'utf8');
         const parse = JSON.parse(getChannelEmotes);
         const knownEmoteNames = new Set(parse);
-        if (!knownEmoteNames) {
-            Logger.info(`No emotes found for ${channelName}`);
-            return;
-        }
 
         const emotesUsedByName = {};
 

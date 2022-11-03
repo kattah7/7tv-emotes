@@ -9,6 +9,23 @@ async function JOIN() {
     client.on('JOIN', async ({ channelName }) => {
         Logger.info(`Joined ${channelName}`);
         const { id } = (await UserInfo(channelName))[0];
+
+        const knownEmoteNames = new Set(
+            (await Emote.findOne({ id: id })).emotes
+                .filter((emote) => emote.isEmote === true)
+                .map((emote) => emote.name)
+        );
+
+        const emoteUsage = (await Emote.findOne({ id: id })).emotes.filter((emote) => isNaN(emote.usage));
+        if (emoteUsage[0]) {
+            for (const emote of emoteUsage) {
+                await Emote.updateOne({ 'id': id, 'emotes.emote': emote.emote }, { $set: { 'emotes.$.usage': 0 } });
+                Logger.info(`Reset usage for ${emote.emote} in ${channelName}`);
+            }
+        }
+        if (knownEmoteNames.size === 0) return;
+        await fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...knownEmoteNames]));
+
         const { emote_set } = await getEmotes(id);
         for (const emote of emote_set.emotes) {
             const emoteDB = await Emote.findOne({ id: id });
@@ -29,24 +46,14 @@ async function JOIN() {
                 },
                 { upsert: true, new: true }
             );
+            const existtingEmoteNames = new Set(
+                (await Emote.findOne({ id: id })).emotes
+                    .filter((emote) => emote.isEmote === true)
+                    .map((emote) => emote.name)
+            );
+            await fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...existtingEmoteNames]));
             Logger.info(`Added ${emote.name} to ${channelName}'s emotes`);
         }
-
-        const knownEmoteNames = new Set(
-            (await Emote.findOne({ id: id })).emotes
-                .filter((emote) => emote.isEmote === true)
-                .map((emote) => emote.name)
-        );
-
-        const emoteUsage = (await Emote.findOne({ id: id })).emotes.filter((emote) => isNaN(emote.usage));
-        if (emoteUsage[0]) {
-            for (const emote of emoteUsage) {
-                await Emote.updateOne({ 'id': id, 'emotes.emote': emote.emote }, { $set: { 'emotes.$.usage': 0 } });
-                Logger.info(`Reset usage for ${emote.emote} in ${channelName}`);
-            }
-        }
-        if (knownEmoteNames.size === 0) return;
-        fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...knownEmoteNames]));
     });
 }
 
