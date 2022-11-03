@@ -7,18 +7,8 @@
     let isSuccess = [];
     let isChannelLoaded = false;
 
-    let WS = new WebSocket(bot.wslink);
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const channel = replaceWindow.toLowerCase();
-
-    function sendWS(type, data) {
-        WS.send(
-            JSON.stringify({
-                type: type,
-                data: data,
-            })
-        );
-    }
 
     async function UserInfo(username) {
         if (!username) return null;
@@ -39,6 +29,17 @@
     onMount(() => {
         fetchChannelEmotes().then((success) => {
             if (success) {
+                const WS = new WebSocket(bot.wslink);
+
+                function sendWS(type, data) {
+                    WS.send(
+                        JSON.stringify({
+                            type: type,
+                            data: data,
+                        })
+                    );
+                }
+
                 isChannelLoaded = true;
                 WS.onopen = async () => {
                     console.log(`Connected to room ${channel}`);
