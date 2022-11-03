@@ -31,6 +31,7 @@ async function JOIN() {
         for (const emote of emote_set.emotes) {
             const emoteDB = await Emote.findOne({ id: id });
             const emoteIDS = emoteDB?.emotes.map((emote) => emote.emote);
+            Logger.info(`querying ${emote.name} in ${channelName}`);
             if (emoteDB && emoteIDS?.includes(emote.id)) continue;
             await Emote.findOneAndUpdate(
                 { id: id },
