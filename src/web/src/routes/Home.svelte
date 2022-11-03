@@ -33,58 +33,6 @@
         );
     }
 
-    WS.onopen = () => {
-        sendWS('listen', { room: 'global:top' });
-    };
-
-    WS.onmessage = ({ type, data }) => {
-        const parsed = JSON.parse(data);
-        const { actor, channel, count, emoteName } = parsed.data;
-
-        if (count !== null) {
-            topEmotes.forEach((emote) => {
-                if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
-                    for (let i = 0; i < topEmotes.length; i++) {
-                        if (topEmotes[i].name === emoteName) {
-                            topEmotes[i].usage = realUsage;
-                        }
-                    }
-                }
-            });
-        }
-    };
-
-    globalWS.onopen = () => {
-        console.log('Connected to global WS');
-        sendGlobalWS('listen', { room: 'global' });
-    };
-
-    globalWS.onmessage = ({ data }) => {
-        const parsed = JSON.parse(data);
-        const {
-            type,
-            data: { emote: emoteName, channelCount, count, user },
-        } = parsed;
-
-        if (type === 'emote') {
-            globalEmotes.forEach((emote) => {
-                if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
-                    for (let i = 0; i < globalEmotes.length; i++) {
-                        if (globalEmotes[i].name === emoteName) {
-                            globalEmotes[i].usage = realUsage;
-                        }
-                    }
-                }
-            });
-        }
-
-        if (type === 'join') {
-            channels += 1;
-        }
-    };
-
     const fetchTopEmotes = async () => {
         const { data, channels, success } = await fetch(`api/bot/top`, {
             method: 'GET',
@@ -109,15 +57,67 @@
     };
 
     onMount(async () => {
-        fetchGlobal().then((success) => {
+        await fetchGlobal().then((success) => {
             if (success) {
                 isGlobalLoaded = true;
+
+                globalWS.onopen = () => {
+                    console.log('Connected to global WS');
+                    sendGlobalWS('listen', { room: 'global' });
+                };
+
+                globalWS.onmessage = ({ data }) => {
+                    const parsed = JSON.parse(data);
+                    const {
+                        type,
+                        data: { emote: emoteName, channelCount, count, user },
+                    } = parsed;
+
+                    if (type === 'emote') {
+                        globalEmotes.forEach((emote) => {
+                            if (emote.name === emoteName) {
+                                const realUsage = parseInt(emote.usage + count);
+                                for (let i = 0; i < globalEmotes.length; i++) {
+                                    if (globalEmotes[i].name === emoteName) {
+                                        globalEmotes[i].usage = realUsage;
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    if (type === 'join') {
+                        channels += 1;
+                    }
+                };
             }
         });
 
-        fetchTopEmotes().then((success) => {
+        await fetchTopEmotes().then((success) => {
             if (success) {
                 isTopLoaded = true;
+
+                WS.onopen = () => {
+                    sendWS('listen', { room: 'global:top' });
+                };
+
+                WS.onmessage = ({ type, data }) => {
+                    const parsed = JSON.parse(data);
+                    const { actor, channel, count, emoteName } = parsed.data;
+
+                    if (count !== null) {
+                        topEmotes.forEach((emote) => {
+                            if (emote.name === emoteName) {
+                                const realUsage = parseInt(emote.usage + count);
+                                for (let i = 0; i < topEmotes.length; i++) {
+                                    if (topEmotes[i].name === emoteName) {
+                                        topEmotes[i].usage = realUsage;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                };
             }
         });
     });
