@@ -1,6 +1,9 @@
 <script>
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
+    import { onMount } from 'svelte';
+    let isGlobalLoaded = false;
+    let isTopLoaded = false;
 
     let topEmotes = [];
     let topEmotesChannels = [];
@@ -9,18 +12,39 @@
     let channels = [];
     let sinceTracking = '';
 
+    let globalWS = new WebSocket(bot.wsglobal);
+    let WS = new WebSocket(bot.wslink);
+
+    function sendGlobalWS(type, data) {
+        globalWS.send(
+            JSON.stringify({
+                type: type,
+                data: data,
+            })
+        );
+    }
+
+    function sendWS(type, data) {
+        WS.send(
+            JSON.stringify({
+                type: type,
+                data: data,
+            })
+        );
+    }
+
     const fetchTopEmotes = async () => {
-        const { data, channels } = await fetch(`api/bot/top`, {
+        const { data, channels, success } = await fetch(`api/bot/top`, {
             method: 'GET',
         }).then((r) => r.json());
         const sortByUsage = data.sort((a, b) => b.usage - a.usage);
         topEmotes = sortByUsage;
         topEmotesChannels = channels;
+        return success;
     };
-    fetchTopEmotes();
 
     const fetchGlobal = async () => {
-        const { data } = await fetch(`https://api.kattah.me/global`, {
+        const { data, success } = await fetch(`https://api.kattah.me/global`, {
             // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
@@ -29,76 +53,72 @@
         globalEmotes = sortByUsage;
         channels = logging_channels;
         sinceTracking = since;
+        return success;
     };
-    fetchGlobal();
 
-    document.addEventListener('DOMContentLoaded', () => {
-        let globalWS = new WebSocket(bot.wsglobal);
-        function sendGlobalWS(type, data) {
-            globalWS.send(
-                JSON.stringify({
-                    type: type,
-                    data: data,
-                })
-            );
-        }
-        globalWS.onopen = () => {
-            sendGlobalWS('listen', { room: 'global' });
-        };
-        globalWS.onmessage = ({ data }) => {
-            const parsed = JSON.parse(data);
-            const {
-                type,
-                data: { emote: emoteName, channelCount, count, user },
-            } = parsed;
-            if (type === 'emote') {
-                globalEmotes.forEach((emote) => {
-                    if (emote.name === emoteName) {
-                        const realUsage = parseInt(emote.usage + count);
-                        for (let i = 0; i < globalEmotes.length; i++) {
-                            if (globalEmotes[i].name === emoteName) {
-                                globalEmotes[i].usage = realUsage;
+    onMount(() => {
+        fetchGlobal().then((success) => {
+            if (success) {
+                isGlobalLoaded = true;
+
+                globalWS.onopen = () => {
+                    sendGlobalWS('listen', { room: 'global' });
+                };
+
+                globalWS.onmessage = ({ data }) => {
+                    const parsed = JSON.parse(data);
+                    const {
+                        type,
+                        data: { emote: emoteName, channelCount, count, user },
+                    } = parsed;
+
+                    if (type === 'emote') {
+                        globalEmotes.forEach((emote) => {
+                            if (emote.name === emoteName) {
+                                const realUsage = parseInt(emote.usage + count);
+                                for (let i = 0; i < globalEmotes.length; i++) {
+                                    if (globalEmotes[i].name === emoteName) {
+                                        globalEmotes[i].usage = realUsage;
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
-                });
+
+                    if (type === 'join') {
+                        channels += 1;
+                    }
+                };
             }
-            if (type === 'join') {
-                channels += 1;
-            }
-        };
+        });
 
-        let WS = new WebSocket(bot.wslink);
+        fetchTopEmotes().then((success) => {
+            if (success) {
+                isTopLoaded = true;
 
-        function sendWS(type, data) {
-            WS.send(
-                JSON.stringify({
-                    type: type,
-                    data: data,
-                })
-            );
-        }
+                WS.onopen = () => {
+                    sendWS('listen', { room: 'global:top' });
+                };
 
-        WS.onopen = () => {
-            sendWS('listen', { room: 'global:top' });
-        };
+                WS.onmessage = ({ type, data }) => {
+                    const parsed = JSON.parse(data);
+                    const { actor, channel, count, emoteName } = parsed.data;
 
-        WS.onmessage = ({ type, data }) => {
-            const parsed = JSON.parse(data);
-            const { actor, channel, count, emoteName } = parsed.data;
-            if (count !== null) {
-                topEmotes.forEach((emote) => {
-                    if (emote.name === emoteName) {
-                        const realUsage = parseInt(emote.usage + count);
-                        for (let i = 0; i < topEmotes.length; i++) {
-                            if (topEmotes[i].name === emoteName) {
-                                topEmotes[i].usage = realUsage;
+                    if (count !== null) {
+                        topEmotes.forEach((emote) => {
+                            if (emote.name === emoteName) {
+                                const realUsage = parseInt(emote.usage + count);
+                                for (let i = 0; i < topEmotes.length; i++) {
+                                    if (topEmotes[i].name === emoteName) {
+                                        topEmotes[i].usage = realUsage;
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
-                });
+                };
             }
-        };
+        });
     });
 </script>
 
@@ -107,31 +127,43 @@
 </svelte:head>
 
 <div class="container">
-    <div class="global">
-        <h1 id="global-channel-count">
-            Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
-        </h1>
-        {#each globalEmotes as emotes}
-            <h3 class="emote_name">
-                {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
-            </h3>
-            <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
-            <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
-                <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
-            </a>
-        {/each}
-    </div>
+    {#if isGlobalLoaded}
+        <div class="global">
+            <h1 id="global-channel-count">
+                Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
+            </h1>
+            {#each globalEmotes as emotes}
+                <h3 class="emote_name">
+                    {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
+                </h3>
+                <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
+                <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
+                    <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+                </a>
+            {/each}
+        </div>
+    {:else}
+        <div class="global">
+            <h1 id="global-channel-count">Loading ...</h1>
+        </div>
+    {/if}
 
-    <div class="top">
-        <h1>Top Channel Emotes, Tracking {topEmotesChannels} Channels</h1>
-        {#each topEmotes as emotes}
-            <h3 class="emote_name">{emotes.name}</h3>
-            <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
-            <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
-                <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
-            </a>
-        {/each}
-    </div>
+    {#if isTopLoaded}
+        <div class="top">
+            <h1>Top Channel Emotes, Tracking {topEmotesChannels} Channels</h1>
+            {#each topEmotes as emotes}
+                <h3 class="emote_name">{emotes.name}</h3>
+                <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
+                <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
+                    <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+                </a>
+            {/each}
+        </div>
+    {:else}
+        <div class="top">
+            <h1>Loading ...</h1>
+        </div>
+    {/if}
 </div>
 
 <style>

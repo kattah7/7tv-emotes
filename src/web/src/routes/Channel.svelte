@@ -1,22 +1,15 @@
 <script>
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
+    import { onMount } from 'svelte';
 
     let channelEmotes = [];
     let isSuccess = [];
+    let isChannelLoaded = false;
 
     let WS = new WebSocket(bot.wslink);
     const replaceWindow = window.location.pathname.replace('/c/', '');
     const channel = replaceWindow.toLowerCase();
-
-    const fetchChannelEmotes = async () => {
-        const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
-            method: 'GET',
-        }).then((r) => r.json());
-        channelEmotes = data;
-        isSuccess = success;
-    };
-    fetchChannelEmotes();
 
     function sendWS(type, data) {
         WS.send(
@@ -34,32 +27,48 @@
         return Data;
     }
 
-    WS.onopen = async () => {
-        console.log(`Connected to room ${channel}`);
-        const userID = (await UserInfo(channel))[0].id;
-        if (isSuccess) {
-            sendWS('listen', { room: userID });
-        } else {
-            sendWS('error', { room: userID });
-        }
+    const fetchChannelEmotes = async () => {
+        const { data, success } = await fetch(`/api/bot/info?channel=${channel}`, {
+            method: 'GET',
+        }).then((r) => r.json());
+        channelEmotes = data;
+        isSuccess = success;
+        return success;
     };
 
-    WS.onmessage = ({ type, data }) => {
-        const parsed = JSON.parse(data);
-        const { actor, channel, count, emoteName } = parsed.data;
-        if (count !== null) {
-            channelEmotes.forEach((emote) => {
-                if (emote.name === emoteName) {
-                    const realUsage = parseInt(emote.usage + count);
-                    for (let i = 0; i < channelEmotes.length; i++) {
-                        if (channelEmotes[i].name === emoteName) {
-                            channelEmotes[i].usage = realUsage;
-                        }
+    onMount(() => {
+        fetchChannelEmotes().then((success) => {
+            if (success) {
+                isChannelLoaded = true;
+                WS.onopen = async () => {
+                    console.log(`Connected to room ${channel}`);
+                    const userID = (await UserInfo(channel))[0].id;
+                    if (isSuccess) {
+                        sendWS('listen', { room: userID });
+                    } else {
+                        sendWS('error', { room: userID });
                     }
-                }
-            });
-        }
-    };
+                };
+
+                WS.onmessage = ({ type, data }) => {
+                    const parsed = JSON.parse(data);
+                    const { actor, channel, count, emoteName } = parsed.data;
+                    if (count !== null) {
+                        channelEmotes.forEach((emote) => {
+                            if (emote.name === emoteName) {
+                                const realUsage = parseInt(emote.usage + count);
+                                for (let i = 0; i < channelEmotes.length; i++) {
+                                    if (channelEmotes[i].name === emoteName) {
+                                        channelEmotes[i].usage = realUsage;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                };
+            }
+        });
+    });
 </script>
 
 <svelte:head>
@@ -68,22 +77,30 @@
 
 <div class="container">
     {#if isSuccess}
-        <div class="channel">
-            <h1 id="channel-emote-count">{replaceWindow}'s Emotes</h1>
-            {#each channelEmotes as emotes}
-                <h3 class="emote_name">
-                    {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? `Emote not found`}
-                </h3>
-                <p class="emote_usage" id={emotes.name}>{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
-                <p class="emote_date">
-                    Added at<br />{new Date(emotes.Date).toLocaleDateString('en-US') ?? `Emote not found`}
-                </p>
-                <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
-                    <img class="emote_image" src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
-                </a>
-            {/each}
-        </div>
-    {:else if !isSuccess}
+        {#if isChannelLoaded}
+            <div class="channel">
+                <h1 id="channel-emote-count">{replaceWindow}'s Emotes</h1>
+                {#each channelEmotes as emotes}
+                    <h3 class="emote_name">
+                        {emotes.name.length > 13
+                            ? emotes.name.substring(0, 12) + '...'
+                            : emotes.name ?? `Emote not found`}
+                    </h3>
+                    <p class="emote_usage" id={emotes.name}>{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
+                    <p class="emote_date">
+                        Added at<br />{new Date(emotes.Date).toLocaleDateString('en-US') ?? `Emote not found`}
+                    </p>
+                    <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
+                        <img class="emote_image" src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
+                    </a>
+                {/each}
+            </div>
+        {:else}
+            <div class="channel">
+                <h1 id="channel-emote-count">Loading...</h1>
+            </div>
+        {/if}
+    {:else}
         <h1>Channel not found, Authorize <a href="/auth/twitch">Here</a> or Ask @Kattah</h1>
     {/if}
 </div>
