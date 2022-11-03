@@ -19,7 +19,10 @@ async function JOIN() {
         const emoteUsage = (await Emote.findOne({ id: id })).emotes.filter((emote) => isNaN(emote.usage));
         if (emoteUsage[0]) {
             for (const emote of emoteUsage) {
-                await Emote.updateOne({ 'id': id, 'emotes.emote': emote.emote }, { $set: { 'emotes.$.usage': 0 } });
+                await Emote.updateOne(
+                    { 'id': id, 'emotes.emote': emote.emote },
+                    { $set: { 'emotes.$.usage': 0 } }
+                ).exec();
                 Logger.info(`Reset usage for ${emote.emote} in ${channelName}`);
             }
         }
@@ -29,7 +32,7 @@ async function JOIN() {
         const { emote_set } = await getEmotes(id);
         if (!emote_set.emotes) return;
         for (const emote of emote_set.emotes) {
-            const emoteDB = await Emote.findOne({ id: id });
+            const emoteDB = await Emote.findOne({ id: id }).exec();
             const emoteIDS = emoteDB?.emotes.map((emote) => emote.emote);
             Logger.info(`querying ${emote.name} in ${channelName}`);
             if (emoteDB && emoteIDS?.includes(emote.id)) continue;
@@ -47,7 +50,7 @@ async function JOIN() {
                     },
                 },
                 { upsert: true, new: true }
-            );
+            ).exec();
             const existtingEmoteNames = new Set(
                 (await Emote.findOne({ id: id })).emotes
                     .filter((emote) => emote.isEmote === true)
