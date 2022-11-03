@@ -56,12 +56,13 @@
         return success;
     };
 
-    onMount(() => {
-        fetchGlobal().then((success) => {
+    onMount(async () => {
+        await fetchGlobal().then((success) => {
             if (success) {
                 isGlobalLoaded = true;
 
                 globalWS.onopen = () => {
+                    console.log('Connected to global WS');
                     sendGlobalWS('listen', { room: 'global' });
                 };
 
@@ -92,7 +93,7 @@
             }
         });
 
-        fetchTopEmotes().then((success) => {
+        await fetchTopEmotes().then((success) => {
             if (success) {
                 isTopLoaded = true;
 
