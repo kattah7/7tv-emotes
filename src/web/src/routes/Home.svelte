@@ -12,27 +12,6 @@
     let channels = [];
     let sinceTracking = '';
 
-    let globalWS = new WebSocket(bot.wsglobal);
-    let WS = new WebSocket(bot.wslink);
-
-    function sendGlobalWS(type, data) {
-        globalWS.send(
-            JSON.stringify({
-                type: type,
-                data: data,
-            })
-        );
-    }
-
-    function sendWS(type, data) {
-        WS.send(
-            JSON.stringify({
-                type: type,
-                data: data,
-            })
-        );
-    }
-
     const fetchTopEmotes = async () => {
         const { data, channels, success } = await fetch(`api/bot/top`, {
             method: 'GET',
@@ -59,6 +38,16 @@
     onMount(async () => {
         await fetchGlobal().then((success) => {
             if (success) {
+                const globalWS = new WebSocket(bot.wsglobal);
+
+                function sendGlobalWS(type, data) {
+                    globalWS.send(
+                        JSON.stringify({
+                            type: type,
+                            data: data,
+                        })
+                    );
+                }
                 isGlobalLoaded = true;
 
                 globalWS.onopen = () => {
@@ -95,7 +84,17 @@
 
         await fetchTopEmotes().then((success) => {
             if (success) {
+                const WS = new WebSocket(bot.wslink);
                 isTopLoaded = true;
+
+                function sendWS(type, data) {
+                    WS.send(
+                        JSON.stringify({
+                            type: type,
+                            data: data,
+                        })
+                    );
+                }
 
                 WS.onopen = () => {
                     sendWS('listen', { room: 'global:top' });
