@@ -113,7 +113,7 @@
         </h1>
         {#each globalEmotes as emotes}
             <h3 class="emote_name">
-                {emotes.name.length > 16 ? emotes.name.substring(0, 12) + '. . .' : emotes.name ?? 'Emote not found'}
+                {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
             </h3>
             <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
             <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">

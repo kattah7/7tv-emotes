@@ -72,9 +72,7 @@
             <h1 id="channel-emote-count">{replaceWindow}'s Emotes</h1>
             {#each channelEmotes as emotes}
                 <h3 class="emote_name">
-                    {emotes.name.length > 15
-                        ? emotes.name.substring(0, 12) + '. . .'
-                        : emotes.name ?? `Emote not found`}
+                    {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? `Emote not found`}
                 </h3>
                 <p class="emote_usage" id={emotes.name}>{emotes.usage.toLocaleString() ?? `Emote not found`}</p>
                 <p class="emote_date">
