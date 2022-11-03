@@ -27,7 +27,7 @@ async function JOIN() {
         await fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...knownEmoteNames]));
 
         const { emote_set } = await getEmotes(id);
-        console.log(emote_set, id);
+        if (!emote_set.emotes) return;
         for (const emote of emote_set.emotes) {
             const emoteDB = await Emote.findOne({ id: id });
             const emoteIDS = emoteDB?.emotes.map((emote) => emote.emote);
