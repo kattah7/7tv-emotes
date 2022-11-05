@@ -2,6 +2,7 @@
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
     import { onMount } from 'svelte';
+    import App from '../App.svelte';
     let isGlobalLoaded = false;
     let isTopLoaded = false;
 
@@ -134,7 +135,7 @@
             </h1>
             {#each globalEmotes as emotes}
                 <h3 class="emote_name">
-                    {emotes.name.length > 13 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
+                    {emotes.name.length > 18 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
                 </h3>
                 <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
                 <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
@@ -152,7 +153,9 @@
         <div class="top">
             <h1>Top Channel Emotes, Tracking {topEmotesChannels} Channels</h1>
             {#each topEmotes as emotes}
-                <h3 class="emote_name">{emotes.name}</h3>
+                <h3 class="emote_name">
+                    {emotes.name.length > 16 ? emotes.name.substring(0, 12) + '...' : emotes.name ?? 'Emote not found'}
+                </h3>
                 <p class="emote_usage">{emotes.usage.toLocaleString()}</p>
                 <a href="https://7tv.app/emotes/{emotes.emote}" target="_blank">
                     <img src="https://cdn.7tv.app/emote/{emotes.emote}/1x" alt="stv" />
