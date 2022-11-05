@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { bot } from '../../config.json';
 
-const HOSTNAME = `http://localhost:${bot.api}`;
+const HOSTNAME = `http://localhost:${bot.api.internal}`;
 
 export async function joinChannel(channel: string, id: string) {
     const join = await fetch(`${HOSTNAME}/bot/join/${channel}/${id}`, {
@@ -10,7 +10,7 @@ export async function joinChannel(channel: string, id: string) {
     return join;
 }
 
-const RESTAPI = `http://localhost:${bot.port}`;
+const RESTAPI = `http://localhost:${bot.api.public}`;
 
 export async function getTopEmotes() {
     const topEmotes = await fetch(`${RESTAPI}/top`).then((res) => res.json());

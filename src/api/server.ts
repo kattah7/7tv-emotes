@@ -14,6 +14,6 @@ app.use(cors());
 for (const routes of [channelInfo, global, top, join]) {
     app.use(routes);
 }
-app.listen(bot.port, () => {
-    Logger.info('Server is running on port ' + bot.port);
+app.listen(bot.api.public, () => {
+    Logger.info('Public API is running on port ' + bot.api.public);
 });

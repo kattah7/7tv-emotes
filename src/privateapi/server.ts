@@ -9,6 +9,6 @@ const app = express();
 app.use(morgan('dev'));
 app.use(cors());
 app.use(join);
-app.listen(bot.api, () => {
-    Logger.info('Private API Server is running on port ' + bot.api);
+app.listen(bot.api.internal, () => {
+    Logger.info('Internal API Server is running on port ' + bot.api.internal);
 });

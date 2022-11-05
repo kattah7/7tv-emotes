@@ -76,13 +76,19 @@ You will be greeted with
         "username": "justinfan12312", // bot name. justinfan for anonymous
         "admin": "kattah",
         "prefix": "!", // prefix of the bot
-        "port": 5005, // port for API
-        "api": 5007, // port for interal API
         "token": "cum",
         "channel": "kattah", // test channel to join
-        "websocket": 9100, // port for starting websocket
-        "wslink": "ws://localhost:9100",
-        "wsglobal": "ws://localhost:7500", // for this, you would have to make a bot that joins millions of channels and make a websocket on that bot that connects to this.
+        "api": {
+            "public": 5000, // port for API
+            "internal": 6969 // port for interal API
+        },
+        "socket": {
+            "host": "ws://localhost:8080", // host for top and channel websocket
+            "port": 8080, // port for the host above
+            "global": {
+                "host": "ws://localhost:7500" // for this, you would have to make a bot that joins millions of channels and make a websocket on that bot that connects to this. replace with wss://global-ws.kattah.me if you dont have one
+            }
+        },ebsocket on that bot that connects to this.
         "mongo": "mongodb://127.0.0.1:27017/stv"
     },
     "web": {
@@ -101,7 +107,9 @@ This repo requires [Yarn](https://classic.yarnpkg.com/), [Node](https://nodejs.o
 
 Run `git clone`
 
-Run `cd 7tvemotes`
+Run `cd 7tv-emotes`
+
+Rename `example.config.json to config.json` and follow the instructions above.
 
 Run `yarn` to install the packages.
 

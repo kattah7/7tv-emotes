@@ -29,7 +29,7 @@
     onMount(() => {
         fetchChannelEmotes().then((success) => {
             if (success) {
-                const WS = new WebSocket(bot.wslink);
+                const WS = new WebSocket(bot.socket.host);
 
                 function sendWS(type, data) {
                     WS.send(

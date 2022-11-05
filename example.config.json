@@ -3,13 +3,19 @@
         "username": "justinfan12312",
         "admin": "kattah",
         "prefix": "!",
-        "port": 5000,
-        "api": 6969,
         "token": "cum",
         "channel": "kattah",
-        "websocket": 8080,
-        "wslink": "ws://localhost:8080",
-        "wsglobal": "ws://localhost:7500",
+        "api": {
+            "public": 5000,
+            "internal": 6969
+        },
+        "socket": {
+            "host": "ws://localhost:8080",
+            "port": 8080,
+            "global": {
+                "host": "ws://localhost:7500"
+            }
+        },
         "mongo": "mongodb://127.0.0.1:27017/stv"
     },
     "web": {

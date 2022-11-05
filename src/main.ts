@@ -6,7 +6,7 @@ import { createSocketServer } from './websocket/socket';
 import * as Logger from './utility/logger';
 require('./api/server');
 require('./privateapi/server');
-createSocketServer(bot.websocket);
+createSocketServer(bot.socket.port);
 
 async function init() {
     try {

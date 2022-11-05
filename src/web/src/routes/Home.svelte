@@ -38,7 +38,7 @@
     onMount(async () => {
         await fetchGlobal().then((success) => {
             if (success) {
-                const globalWS = new WebSocket(bot.wsglobal);
+                const globalWS = new WebSocket(bot.socket.global.host);
 
                 function sendGlobalWS(type, data) {
                     globalWS.send(
@@ -84,7 +84,7 @@
 
         await fetchTopEmotes().then((success) => {
             if (success) {
-                const WS = new WebSocket(bot.wslink);
+                const WS = new WebSocket(bot.socket.host);
                 isTopLoaded = true;
 
                 function sendWS(type, data) {
