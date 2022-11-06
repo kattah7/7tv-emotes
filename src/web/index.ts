@@ -5,12 +5,16 @@ import { Strategy as OAuth2Strategy } from 'passport-oauth2';
 import request from 'request';
 import cors from 'cors';
 import { web } from '../../config.json';
-import join from './join';
-import top from './top';
-import channel from './channel';
-import global from './global';
+import redis from '.././utility/redis';
 import * as Logger from '../utility/logger';
+
+import join from './routers/join';
+import top from './routers/top';
+import channel from './routers/channel';
+import global from './routers/global';
+
 const app = express();
+let RedisStore = require('connect-redis')(session);
 
 declare module 'express-session' {
     export interface SessionData {
@@ -23,10 +27,20 @@ const TWITCH_SECRET = web.twitchSecret;
 const SESSION_SECRET = web.sessionSecret;
 const CALLBACK_URL = web.callbackURL;
 
-app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }));
-for (const origin of [passport.session(), passport.initialize(), cors(), join, top, channel, global]) {
-    app.use(origin);
-}
+app.use(
+    session({
+        secret: SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: new RedisStore({ client: redis }),
+    }),
+    passport.session(),
+    passport.initialize(),
+    cors(),
+    express.json(),
+    express.urlencoded({ extended: true }),
+    [join, top, channel, global]
+);
 
 OAuth2Strategy.prototype.userProfile = function (accessToken: string, done) {
     const options = {
