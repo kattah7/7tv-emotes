@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import { getGlobalEmotes } from './bot';
+import { getTopEmotes } from '../bot';
 
-router.get('/api/bot/global', async (req: any, res: any) => {
-    const r = await getGlobalEmotes();
+router.get('/api/bot/top', async (req: any, res: any) => {
+    const r = await getTopEmotes();
     if (!r.success) {
         return res.json({
             success: false,

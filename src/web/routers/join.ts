@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { joinChannel } from './bot';
+import { joinChannel } from '../bot';
 
 router.post('/api/bot/join', async (req: any, res: any) => {
     if (!req.session || !req.session.passport || !req.session.passport.user) {

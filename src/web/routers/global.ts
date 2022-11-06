@@ -1,11 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import { getChannelEmotes } from './bot';
+import { getGlobalEmotes } from '../bot';
 
-router.get('/api/bot/info', async (req: any, res: any) => {
-    const { channel } = req.query;
-
-    const r = await getChannelEmotes(channel.toLowerCase());
+router.get('/api/bot/global', async (req: any, res: any) => {
+    const r = await getGlobalEmotes();
     if (!r.success) {
         return res.json({
             success: false,

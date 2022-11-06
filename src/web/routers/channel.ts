@@ -1,9 +1,11 @@
 import express from 'express';
 const router = express.Router();
-import { getTopEmotes } from './bot';
+import { getChannelEmotes } from '../bot';
 
-router.get('/api/bot/top', async (req: any, res: any) => {
-    const r = await getTopEmotes();
+router.get('/api/bot/info', async (req: any, res: any) => {
+    const { channel } = req.query;
+
+    const r = await getChannelEmotes(channel.toLowerCase());
     if (!r.success) {
         return res.json({
             success: false,
