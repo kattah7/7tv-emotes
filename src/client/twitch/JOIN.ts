@@ -44,6 +44,13 @@ async function JOIN() {
             if (!filteredEmotes.has(emote.id)) {
                 emotes.push(emote);
             } else {
+                if (emote.name !== emote.data.name) {
+                    await Emote.updateOne(
+                        { 'id': id, 'emotes.emote': emote.id },
+                        { $set: { 'emotes.$.name': emote.name } }
+                    ).exec();
+                }
+
                 deletedEmotes.push(emote);
                 if (deletedEmotesQuery.has(emote.id)) {
                     await Emote.updateOne(
