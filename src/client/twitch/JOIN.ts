@@ -34,6 +34,18 @@ async function JOIN() {
 
         const filteredEmotes = await emoteInfo(true, 'emote', false);
         const deletedEmotesQuery = await emoteInfo(false, 'emote', true);
+        const duplicateNames = await Emote.findOne({ id: id }).then((emote: any) => {
+            const names = emote.emotes.map((emote: any) => emote.name);
+            // return the id of the emote that has a duplicate name
+            return names
+                .filter((name: any, index: any) => names.indexOf(name) !== index)
+                .map((name: any) => emote.emotes.find((emote: any) => emote.name === name).emote);
+        });
+
+        for (const emote of duplicateNames) {
+            await Emote.updateOne({ id: id }, { $pull: { emotes: { emote: emote } } }).exec();
+            Logger.info(`Deleted duplicate emote ${emote} in ${channelName}`);
+        }
 
         const { emote_set } = await getEmotes(id);
         if (!emote_set.emotes) return;
