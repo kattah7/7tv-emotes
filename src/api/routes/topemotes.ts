@@ -2,7 +2,9 @@ import express from 'express';
 import { Emote } from '../../utility/db';
 const router = express.Router();
 
-router.get('/top', async (req, res) => {
+let dataMapped = [];
+let channels = 0;
+setInterval(async () => {
     const allEmotes = await Emote.find({});
     const PushAllEmotes = [];
     allEmotes.forEach((emote) => {
@@ -31,10 +33,15 @@ router.get('/top', async (req, res) => {
         };
     });
 
+    dataMapped = emotesMapped;
+    channels = await Emote.countDocuments();
+}, 1000 * 10);
+
+router.get('/top', async (req, res) => {
     return res.status(200).json({
         success: true,
-        channels: await Emote.countDocuments(),
-        data: emotesMapped,
+        channels: channels,
+        data: dataMapped,
     });
 });
 
