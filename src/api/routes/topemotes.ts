@@ -35,7 +35,7 @@ setInterval(async () => {
 
     dataMapped = emotesMapped;
     channels = await Emote.countDocuments();
-}, 1000 * 10);
+}, 1000 * 60 * 1);
 
 router.get('/top', async (req, res) => {
     return res.status(200).json({
