@@ -94,7 +94,7 @@ async function JOIN() {
             );
 
             const findThatEmote = (await Emote.findOne({ id: id })).emotes.filter(
-                (emote2) => emote2.isEmote === true && emote2.name === findThatSpecificEmote.name
+                (emote2) => emote2.isEmote === true && emote2.name === findThatSpecificEmote?.name
             );
 
             await Emote.updateOne(
@@ -102,7 +102,7 @@ async function JOIN() {
                 { $set: { 'emotes.$.usage': findThatEmote[0].usage + findThatSpecificEmote.usage } }
             ).exec();
 
-            await Emote.updateOne({ id: id }, { $pull: { emotes: { emote: findThatSpecificEmote.emote } } }).exec();
+            await Emote.updateOne({ id: id }, { $pull: { emotes: { emote: findThatSpecificEmote?.emote } } }).exec();
             Logger.info(`Combined usage for ${emote} in ${channelName}`);
 
             // merge the emotes
