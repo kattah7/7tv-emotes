@@ -51,13 +51,11 @@ async function JOIN() {
             if (!filteredEmotes.has(emote.id)) {
                 emotes.push(emote);
             } else {
-                if (emote.name !== emote.data.name) {
-                    await Emote.updateOne(
-                        { 'id': id, 'emotes.emote': emote.id },
-                        { $set: { 'emotes.$.name': emote.name } }
-                    ).exec();
-                    Logger.info(`Updated name for ${emote.id} in ${channelName}`);
-                }
+                await Emote.updateOne(
+                    { 'id': id, 'emotes.emote': emote.id },
+                    { $set: { 'emotes.$.name': emote.name } }
+                ).exec();
+                Logger.info(`Updated name for ${emote.id} in ${channelName}`);
 
                 deletedEmotes.push(emote);
                 if (deletedEmotesQuery.has(emote.id)) {
