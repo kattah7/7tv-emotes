@@ -53,9 +53,11 @@ async function JOIN() {
 
                 deletedEmotes.push(emote);
                 if (deletedEmotesQuery.has(emote.id)) {
+                    console.log(emote.name);
+                    // set emote to true and change name
                     await Emote.updateOne(
                         { 'id': id, 'emotes.emote': emote.id },
-                        { $set: { 'emotes.$.isEmote': true } }
+                        { $set: { 'emotes.$.isEmote': true, 'emotes.$.name': emote.name } }
                     ).exec();
                     Logger.info(`Set ${emote.name} back to true in ${channelName}`);
                 }
@@ -70,9 +72,13 @@ async function JOIN() {
         if (filterEmotes.length > 0) {
             for (const emote of filterEmotes) {
                 if (emotesByIDAndTrue.has(emote)) {
+                    const fetchThatEmoteInDB = (await Emote.findOne({ id: id })).emotes;
+                    const findThatEmote = fetchThatEmoteInDB.find((emoteDB) => emoteDB.emote === emote);
+                    console.log(findThatEmote);
+                    // set false and change emote name
                     await Emote.updateOne(
                         { 'id': id, 'emotes.emote': emote },
-                        { $set: { 'emotes.$.isEmote': false } }
+                        { $set: { 'emotes.$.isEmote': false, 'emotes.$.name': `Emote Removed ${findThatEmote.name}` } }
                     ).exec();
                     Logger.info(`Set ${emote} to false in ${channelName}`);
                 }
