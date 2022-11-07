@@ -80,33 +80,33 @@ async function JOIN() {
             Logger.info(`Added ${name} to ${channelName}`);
         }
 
-        const duplicateNames = await Emote.findOne({ id: id }).then((emote: any) => {
-            const names = emote.emotes.map((emote: any) => emote.name);
-            // return the id of the emote that has a duplicate name
-            return names
-                .filter((name: any, index: any) => names.indexOf(name) !== index)
-                .map((name: any) => emote.emotes.find((emote: any) => emote.name === name).emote);
-        });
+        // const duplicateNames = await Emote.findOne({ id: id }).then((emote: any) => {
+        //     const names = emote.emotes.map((emote: any) => emote.name);
+        //     // return the id of the emote that has a duplicate name
+        //     return names
+        //         .filter((name: any, index: any) => names.indexOf(name) !== index)
+        //         .map((name: any) => emote.emotes.find((emote: any) => emote.name === name).emote);
+        // });
 
-        for (const emote of duplicateNames) {
-            const findThatSpecificEmote = (await Emote.findOne({ id: id })).emotes.find(
-                (emote2) => emote2.emote === emote
-            );
+        // for (const emote of duplicateNames) {
+        //     const findThatSpecificEmote = (await Emote.findOne({ id: id })).emotes.find(
+        //         (emote2) => emote2.emote === emote
+        //     );
 
-            const findThatEmote = (await Emote.findOne({ id: id })).emotes.filter(
-                (emote2) => emote2.isEmote === true && emote2.name === findThatSpecificEmote?.name
-            );
+        //     const findThatEmote = (await Emote.findOne({ id: id })).emotes.filter(
+        //         (emote2) => emote2.isEmote === true && emote2.name === findThatSpecificEmote?.name
+        //     );
 
-            await Emote.updateOne(
-                { 'id': id, 'emotes.emote': findThatEmote[0].emote },
-                { $set: { 'emotes.$.usage': findThatEmote[0].usage + findThatSpecificEmote.usage } }
-            ).exec();
+        //     await Emote.updateOne(
+        //         { 'id': id, 'emotes.emote': findThatEmote[0].emote },
+        //         { $set: { 'emotes.$.usage': findThatEmote[0].usage + findThatSpecificEmote.usage } }
+        //     ).exec();
 
-            await Emote.updateOne({ id: id }, { $pull: { emotes: { emote: findThatSpecificEmote?.emote } } }).exec();
-            Logger.info(`Combined usage for ${emote} in ${channelName}`);
+        //     await Emote.updateOne({ id: id }, { $pull: { emotes: { emote: findThatSpecificEmote?.emote } } }).exec();
+        //     Logger.info(`Combined usage for ${emote} in ${channelName}`);
 
-            // merge the emotes
-        }
+        //     // merge the emotes
+        // }
 
         const emoteNames = await emoteInfo(true, 'name', true);
         await fs.writeFile(`./src/stats/${id}.json`, JSON.stringify([...emoteNames]));
