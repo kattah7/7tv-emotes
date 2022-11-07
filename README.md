@@ -111,6 +111,8 @@ Run `cd 7tv-emotes`
 
 Rename `example.config.json to config.json` and follow the instructions above.
 
+Run `mkdir src/stats`
+
 Run `yarn` to install the packages.
 
 Run `yarn build && node .` This will build the typescript files into javascript and run it with node.
