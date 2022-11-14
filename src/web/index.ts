@@ -33,6 +33,9 @@ app.use(
         resave: false,
         saveUninitialized: false,
         store: new RedisStore({ client: redis }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+        },
     }),
     passport.session(),
     passport.initialize(),
