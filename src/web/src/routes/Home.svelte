@@ -2,7 +2,6 @@
     import fetch from 'node-fetch';
     import { bot } from '../../../../config.json';
     import { onMount } from 'svelte';
-    import App from '../App.svelte';
     let isGlobalLoaded = false;
     let isTopLoaded = false;
 
@@ -25,13 +24,11 @@
 
     const fetchGlobal = async () => {
         const { data, success } = await fetch(`https://api.kattah.me/global`, {
-            // CHANGE TO HOSTNAME/GLOBAL AFTER TESTING
             method: 'GET',
         }).then((r) => r.json());
-        const { logging_since: since, logging_channels, global } = data;
+        const { logging_since: since, global } = data;
         const sortByUsage = global.sort((a, b) => b.usage - a.usage);
         globalEmotes = sortByUsage;
-        channels = logging_channels;
         sinceTracking = since;
         return success;
     };
@@ -60,7 +57,7 @@
                     const parsed = JSON.parse(data);
                     const {
                         type,
-                        data: { emote: emoteName, channelCount, count, user },
+                        data: { emote: emoteName, count },
                     } = parsed;
 
                     if (type === 'emote') {
@@ -74,10 +71,6 @@
                                 }
                             }
                         });
-                    }
-
-                    if (type === 'join') {
-                        channels += 1;
                     }
                 };
             }
@@ -103,8 +96,7 @@
 
                 WS.onmessage = ({ type, data }) => {
                     const parsed = JSON.parse(data);
-                    const { actor, channel, count, emoteName } = parsed.data;
-
+                    const { count, emoteName } = parsed.data;
                     if (count !== null) {
                         topEmotes.forEach((emote) => {
                             if (emote.name === emoteName) {
@@ -131,7 +123,7 @@
     {#if isGlobalLoaded}
         <div class="global">
             <h1 id="global-channel-count">
-                Global Emotes, Tracking {channels.toLocaleString()} Channels <br /> Since {sinceTracking.split('T')[0]}
+                Global Emotes <br /> Since {sinceTracking.split('T')[0]}
             </h1>
             {#each globalEmotes as emotes}
                 <h3 class="emote_name">

@@ -87,11 +87,13 @@ passport.use(
         function (
             accessToken: any,
             refreshToken: any,
-            profile: { accessToken: any; refreshToken: any },
+            expire: { expires_in: any },
+            profile: { accessToken: any; refreshToken: any; expires_in: any },
             done: (arg0: any, arg1: any) => void
         ) {
             profile.accessToken = accessToken;
             profile.refreshToken = refreshToken;
+            profile.expires_in = expire.expires_in;
 
             // Securely store user profile in your DB
             //User.findOrCreate(..., function(err, user) {
