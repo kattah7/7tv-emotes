@@ -10,7 +10,7 @@ async function JOIN() {
         Logger.info(`Joined ${channelName}`);
         const { id } = (await UserInfo(channelName))[0];
 
-        const emoteUsage = (await Emote.findOne({ id: id })).emotes.filter((emote) => isNaN(emote.usage));
+        const emoteUsage = (await Emote.findOne({ id: id }))?.emotes.filter((emote) => isNaN(emote.usage));
         if (emoteUsage[0]) {
             for (const emote of emoteUsage) {
                 await Emote.updateOne(
@@ -38,8 +38,8 @@ async function JOIN() {
         const { emote_set } = await getEmotes(id);
         if (!emote_set.emotes) return;
 
-        let emotes = [];
-        let deletedEmotes = [];
+        const emotes = [];
+        const deletedEmotes = [];
         for (const emote of emote_set.emotes) {
             if (!filteredEmotes.has(emote.id)) {
                 emotes.push(emote);
