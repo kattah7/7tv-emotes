@@ -11,6 +11,7 @@ async function JOIN() {
         const { id } = (await UserInfo(channelName))[0];
 
         const emoteUsage = (await Emote.findOne({ id: id }))?.emotes.filter((emote) => isNaN(emote.usage));
+        if (!emoteUsage) return;
         if (emoteUsage[0]) {
             for (const emote of emoteUsage) {
                 await Emote.updateOne(
