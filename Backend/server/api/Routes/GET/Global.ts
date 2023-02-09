@@ -9,7 +9,7 @@ interface ApiResponse {
 }
 
 Router.get('/global', Limiter(1000, 5), async (req, res) => {
-	const response = (await fetch(`https://api.kattah.me/global`, {
+	const response = (await fetch(`http://localhost:5002/global`, {
 		method: 'GET',
 	}).then((res) => res.json())) as ApiResponse;
 	if (!response.success) return;
