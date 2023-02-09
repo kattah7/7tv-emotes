@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"useDefineForClassFields": true,
+		"module": "ESNext",
+		"resolveJsonModule": true,
+		/**
+		 * Typecheck JS in `.svelte` and `.js` files by default.
+		 * Disable checkJs if you'd like to use dynamic types in JS.
+		 * Note that setting allowJs false does not prevent the use
+		 * of JS in `.svelte` files.
+		 */
+		"outDir": "../Backend/build",
+		"sourceMap": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"lib": ["ES2021", "ES6", "DOM.Iterable", "ES5", "DOM"]
+	},
+	"include": ["server/**/*.d.ts", "server/**/*.ts"]
+}
