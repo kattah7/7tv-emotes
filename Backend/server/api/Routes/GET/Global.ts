@@ -5,25 +5,35 @@ const Router = Express.Router();
 
 interface ApiResponse {
 	success: boolean;
-	data: any;
+	logging_channels: number;
+	emotes: Emotes[];
 }
+
+type Emotes = {
+	emote: string;
+	emote_id: string;
+	count: number;
+	date: string;
+};
 
 Router.get('/global', Limiter(1000, 5), async (req, res) => {
 	const response = (await fetch(`http://localhost:5002/global`, {
 		method: 'GET',
 	}).then((res) => res.json())) as ApiResponse;
-	if (!response.success) return;
+	if (!response) return;
 
-	const mapped = response.data.global.map((emote: any) => {
+	const mapped = response.emotes.map((emote: Emotes) => {
 		return {
-			emote: emote.name,
-			emote_id: emote.emote,
-			total_count: emote.usage,
+			emote: emote.emote,
+			emote_id: emote.emote_id,
+			total_count: emote.count,
+			tracking: emote.date,
 		};
 	});
 
 	return res.status(200).json({
 		success: true,
+		channels: response.logging_channels,
 		emotes: mapped,
 	});
 });

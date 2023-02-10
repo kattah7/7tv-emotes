@@ -18,7 +18,7 @@
 
 <style lang="scss">
   main {
-    background-color: #1a1b1e;
+    background-color: #1a1d1e;
     flex: 1;
     overflow-y: auto;
   }

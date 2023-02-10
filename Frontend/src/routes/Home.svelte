@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SOCKET_URL } from "../Config";
+  import { SOCKET_URL, GLOBAL_SOCKET_URL } from "../Config";
 
   import { onMount } from "svelte";
   import { UpdateEmote } from "../utils/UpdateEmote";
@@ -29,6 +29,16 @@
         }
       }
     };
+
+    const GlobalWS = new WebSocket(GLOBAL_SOCKET_URL);
+    GlobalWS.onmessage = (event) => {
+      const { type, data } = JSON.parse(event.data);
+      switch (type) {
+        case "global":
+          UpdateEmote(data);
+          break;
+      }
+    };
   });
 </script>
 
@@ -40,7 +50,7 @@
     </div>
     <div class="bottom-title">
       <p>Track your emote usage on 7TV</p>
-      <p>Tracking since 2022-01-01</p>
+      <p>Tracking since 2022-09-08</p>
     </div>
   </div>
 
@@ -62,7 +72,7 @@
   $color-blue: rgb(68, 138, 255);
 
   .Home {
-    background-color: rgb(0, 0, 0);
+    background-color: #0d0f0f;
     max-width: 1200px;
     margin: 0 auto;
     justify-content: center;
