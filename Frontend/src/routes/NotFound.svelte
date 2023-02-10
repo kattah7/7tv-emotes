@@ -6,3 +6,7 @@
     <a href="/">Go back home</a>
   </p>
 </div>
+
+<svelte:head>
+  <title>DontAddThisBot - 404</title>
+</svelte:head>

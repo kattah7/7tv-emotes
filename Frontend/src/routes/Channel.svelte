@@ -90,6 +90,14 @@
   </div>
 </div>
 
+<svelte:head>
+  {#if data.success}
+    <title>DontAddThisBot - {data.user.twitch_username}'s Emotes</title>
+  {:else}
+    <title>DontAddThisBot - Unknown Channel</title>
+  {/if}
+</svelte:head>
+
 <style lang="scss">
   $color-blue: rgb(68, 138, 255);
   h1.error {
