@@ -29,7 +29,9 @@
         }
       }
     };
+  });
 
+  onMount(async () => {
     const GlobalWS = new WebSocket(GLOBAL_SOCKET_URL);
     GlobalWS.onmessage = (event) => {
       const { type, data } = JSON.parse(event.data);
