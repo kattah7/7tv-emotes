@@ -20,6 +20,7 @@ export type Config = {
 	WS: {
 		port: number;
 	};
+	Admins: string[];
 };
 
 export type NewEmote = {

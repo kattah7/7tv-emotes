@@ -1,6 +1,5 @@
 import fetch from 'node-fetch';
-import type { IEmoteSet } from '../types/index.js';
-import type { UserData } from '../types/index.js';
+import type { IEmoteSet, UserData, StvRest } from '../types/index.js';
 
 const GQL = 'https://7tv.io/v3/gql';
 
@@ -48,24 +47,16 @@ export async function GetChannelsGQL(channelIds: string): Promise<IEmoteSet | nu
 		}),
 	}).then((res) => res.json())) as UserData;
 
-	if (errors || !data) {
-		return null;
-	}
+	if (errors || !data) return null;
 
-	if (channelIds !== data.user.id) {
-		return null;
-	}
+	if (channelIds !== data.user.id) return null;
 
 	const { emote_sets, connections } = data.user;
 	const findTwitch = connections.find((connection: { platform: string }) => connection.platform === 'TWITCH');
-	if (!findTwitch) {
-		return null;
-	}
+	if (!findTwitch) return null;
 
 	const findEmoteSet = emote_sets.find((emoteSet: { id: string }) => emoteSet.id === findTwitch.emote_set_id);
-	if (!findEmoteSet) {
-		return null;
-	}
+	if (!findEmoteSet) return null;
 
 	return {
 		id: findTwitch.id,
@@ -80,4 +71,12 @@ export const GetChannels = async (channelIds: string[]): Promise<IEmoteSet[]> =>
 	const filtered = results.filter((result) => result !== null) as IEmoteSet[];
 
 	return filtered;
+};
+
+export const GetStvId = async (channelId: string): Promise<StvRest | null> => {
+	const data = (await fetch(`https://7tv.io/v3/users/twitch/${channelId}`, {
+		method: 'GET',
+	}).then((res) => res.json())) as StvRest;
+	if (!data || data.error) return null;
+	return data;
 };

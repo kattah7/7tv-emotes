@@ -50,3 +50,17 @@ export interface Errors {
 	message: string;
 	path: string[];
 }
+
+export interface IVR {
+	id: string;
+	login: string;
+	display_name: string;
+	length: number;
+}
+
+export interface StvRest {
+	user: {
+		id: string;
+	};
+	error?: string;
+}

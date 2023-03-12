@@ -19,7 +19,7 @@ const LogLevelToEmoji: { [key: string]: string } = {
 };
 
 const consoleFormat = Winston.format.printf(({ level, message, timestamp, module }) => {
-	let upperLevel = ` ${level.toUpperCase()} `;
+	let upperLevel = ` ${level.toUpperCase()} ` as string;
 	const emoji = LogLevelToEmoji[level];
 	switch (level) {
 		case LogLevel.SILLY:

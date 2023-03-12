@@ -59,6 +59,8 @@ Bot.WS = new WebsocketServer(Bot.Config.WS.port);
 		await new Promise((resolve) => setTimeout(resolve, 8));
 		Bot.Twitch.Join(channel);
 	}
+	Bot.Twitch.Join('kattah');
+	Bot.Twitch.Join('kpqy');
 
 	let tookTime = performance.now() - perfomanceTime;
 	Bot.Logger.Log(`Emotes updated for ${count}/${length} channels, took ${tookTime}ms`);
