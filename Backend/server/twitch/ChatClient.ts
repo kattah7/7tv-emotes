@@ -12,9 +12,10 @@ export class ChatClient extends TwitchIRC {
 			password: Bot.Config.Twitch.oauth,
 			rateLimits: 'verifiedBot',
 			ignoreUnhandledPromiseRejections: true,
+			maxChannelCountPerConnection: 1,
 			connectionRateLimits: {
-				parallelConnections: 5,
-				releaseTime: 1000,
+				parallelConnections: 200,
+				releaseTime: 10,
 			},
 			connection: {
 				type: 'websocket',
