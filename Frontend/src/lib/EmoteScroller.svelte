@@ -36,7 +36,7 @@
     <div class="inner-global-emotes">
       <p>{index + 1}</p>
       <img
-        src={`https://cdn.7tv.app/emote/${emote.emote_id}/3x`}
+        src={`https://cdn.7tv.app/emote/${emote.emote_id}/3x.webp`}
         alt={emote.emote}
       />
       <div class="emote-info">
