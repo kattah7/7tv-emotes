@@ -66,7 +66,13 @@ export async function GetChannelsGQL(channelIds: string): Promise<IEmoteSet | nu
 }
 
 export const GetChannels = async (channelIds: string[]): Promise<IEmoteSet[]> => {
-	const promise = channelIds.map((channelId) => GetChannelsGQL(channelId));
+	const promise: Promise<IEmoteSet | null>[] = [];
+	for (const channelId of channelIds) {
+		// @ts-ignore;
+		promise.push(GetChannelsGQL(channelId));
+		await new Promise((resolve) => setTimeout(resolve, 100));
+	}
+
 	const results = await Promise.all(promise);
 	const filtered = results.filter((result) => result !== null) as IEmoteSet[];
 
