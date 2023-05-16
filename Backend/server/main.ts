@@ -2,12 +2,11 @@ import fs from 'fs';
 import { Postgres } from './database/Postgres.js';
 import { RedisClient } from './database/Redis.js';
 import { Logger } from './utility/Logger.js';
-import { ChatClient } from './twitch/ChatClient.js';
-import { WebsocketServer } from './socket/WebSocket.js';
-// import { EventAPI } from "./SevenTV/EventAPI.js";
+import { ChatClient } from './services/TwitchClient.js';
+import { WebsocketServer } from './manager/WebSocketManager.js';
 import { Transfer } from './Transfer.js';
 import { ChannelEmoteManager } from './manager/ChannlEmoteManager.js';
-import { Looper } from './loops/ChannlEmotes.js';
+import { Cronjob } from './utility/Cronjob.js';
 
 // @ts-ignore
 global.Bot = {};
@@ -21,6 +20,8 @@ Bot.Twitch = new ChatClient();
 Bot.Redis = RedisClient.New();
 // @ts-ignore
 Bot.WS = new WebsocketServer(Bot.Config.WS.port);
+// @ts-ignore
+Bot.Cronjob = Cronjob.New();
 /**
  * Disabled until i get gud
  * // @ts-ignore
@@ -51,19 +52,22 @@ Bot.WS = new WebsocketServer(Bot.Config.WS.port);
 		process.kill(process.pid, 'SIGUSR2');
 	});
 
-	const { result, length } = await Bot.SQL.GetChannelsArray();
-	let perfomanceTime: number = performance.now();
-	let { count, channelsToJoin } = await ChannelEmoteManager(result);
+	async function Init() {
+		const { result, length } = await Bot.SQL.GetChannelsArray();
+		let perfomanceTime: number = performance.now();
+		let { count, channelsToJoin } = await ChannelEmoteManager(result);
 
-	for (const channel of channelsToJoin) {
-		await new Promise((resolve) => setTimeout(resolve, 8));
-		Bot.Twitch.Join(channel);
+		for (const channel of channelsToJoin) {
+			await new Promise((resolve) => setTimeout(resolve, 8));
+			Bot.Twitch.Join(channel);
+		}
+		Bot.Twitch.Join('kattah');
+		let tookTime = performance.now() - perfomanceTime;
+		Bot.Logger.Log(`Emotes updated for ${count}/${length} channels, took ${tookTime}ms`);
 	}
-	Bot.Twitch.Join('kattah');
-	Bot.Twitch.Join('kpqy');
 
-	let tookTime = performance.now() - perfomanceTime;
-	Bot.Logger.Log(`Emotes updated for ${count}/${length} channels, took ${tookTime}ms`);
-
-	Looper();
+	await Init();
+	Bot.Cronjob.Schedule('*/30 * * * *', async () => {
+		await Init();
+	});
 })();

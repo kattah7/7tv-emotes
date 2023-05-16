@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ChatClient as TwitchIRC, ConnectionPool } from '@kararty/dank-twitch-irc';
+import { ChatClient as TwitchIRC } from '@kararty/dank-twitch-irc';
 import { singleton } from 'tsyringe';
 import { EmoteHandler } from '../handler/EmoteHandler.js';
 import { CommandHandler } from '../handler/CommandHandler.js';
@@ -8,22 +8,11 @@ import { CommandHandler } from '../handler/CommandHandler.js';
 export class ChatClient extends TwitchIRC {
 	constructor() {
 		super({
-			username: Bot.Config.Twitch.username,
-			password: Bot.Config.Twitch.oauth,
+			username: 'justinfan12312',
+			password: 'lmao',
 			rateLimits: 'verifiedBot',
 			ignoreUnhandledPromiseRejections: true,
-			maxChannelCountPerConnection: 1,
-			connectionRateLimits: {
-				parallelConnections: 200,
-				releaseTime: 10,
-			},
-			connection: {
-				type: 'websocket',
-				secure: true,
-			},
 		});
-
-		// this.use(new ConnectionPool(this, { poolSize: 100 }));
 
 		this.connect();
 
