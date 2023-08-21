@@ -31,17 +31,17 @@
     };
   });
 
-  onMount(async () => {
-    const GlobalWS = new WebSocket(GLOBAL_SOCKET_URL);
-    GlobalWS.onmessage = (event) => {
-      const { type, data } = JSON.parse(event.data);
-      switch (type) {
-        case "global":
-          UpdateEmote(data);
-          break;
-      }
-    };
-  });
+  // onMount(async () => {
+  //   const GlobalWS = new WebSocket(GLOBAL_SOCKET_URL);
+  //   GlobalWS.onmessage = (event) => {
+  //     const { type, data } = JSON.parse(event.data);
+  //     switch (type) {
+  //       case "global":
+  //         UpdateEmote(data);
+  //         break;
+  //     }
+  //   };
+  // });
 </script>
 
 <div class="Home">
@@ -63,7 +63,7 @@
   </div>
 
   <div class="all-emotes">
-    <EmoteScroller type={"GLOBAL"} />
+    <!-- <EmoteScroller type={"GLOBAL"} /> -->
     <EmoteScroller type={"TOP"} />
   </div>
   <Footer />
@@ -197,9 +197,8 @@
     padding: 2rem;
     color: gray;
     text-transform: uppercase;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-      sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
     p {
       margin: 0;
