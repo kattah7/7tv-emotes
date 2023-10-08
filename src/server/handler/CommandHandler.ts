@@ -18,13 +18,13 @@ export async function CommandHandler(msg: PrivmsgMessage) {
 	if (cmd === '7tvAdd' && args[0]) {
 		const targetUser = ParseUser(args[0]);
 		const data = await IVR(targetUser);
-		if (!data || !data.id) return Bot.Logger.Error(`Failed top find ${targetUser} in IVR`);
+		if (!data || !data.id) return Bot.Logger.Error(`Failed to find ${targetUser} in IVR`);
 
 		const StvId = await GetStvId(data.id);
-		if (!StvId) return Bot.Logger.Error(`Failed top find ${targetUser} in 7TV`);
+		if (!StvId) return Bot.Logger.Error(`Failed to find ${targetUser} in 7TV`);
 
 		const Emotes = await GetChannelsGQL(StvId.user.id);
-		if (!Emotes?.emote_sets) return Bot.Logger.Error(`Failed top find ${targetUser} in 7TV Emotes`);
+		if (!Emotes?.emote_sets) return Bot.Logger.Error(`Failed to find ${targetUser} in 7TV Emotes`);
 
 		const doesChannelExist = await Bot.SQL.Query(`SELECT * FROM channels WHERE twitch_id = $1`, [data.id]);
 		if (doesChannelExist.rowCount > 0) return Bot.Logger.Error(`Channel ${targetUser} already exists in the database`);
