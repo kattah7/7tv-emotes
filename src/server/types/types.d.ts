@@ -16,6 +16,7 @@ export type Config = {
 	TRANSFER: boolean;
 	API: {
 		port: number;
+		authKey: string;
 	};
 	WS: {
 		port: number;

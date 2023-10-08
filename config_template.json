@@ -14,7 +14,8 @@
 	},
 	"DEBUG": false,
 	"API": {
-		"port": 5001
+		"port": 5001,
+        "authKey": "forsen"
 	},
 	"WS": {
 		"port": 9100
