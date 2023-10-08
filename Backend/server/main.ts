@@ -4,7 +4,6 @@ import { RedisClient } from './database/Redis.js';
 import { Logger } from './utility/Logger.js';
 import { ChatClient } from './services/TwitchClient.js';
 import { WebsocketServer } from './manager/WebSocketManager.js';
-import { Transfer } from './Transfer.js';
 import { ChannelEmoteManager } from './manager/ChannlEmoteManager.js';
 import { Cronjob } from './utility/Cronjob.js';
 
@@ -33,10 +32,6 @@ Bot.Cronjob = Cronjob.New();
 	// @ts-ignore
 	Bot.SQL = Postgres.New();
 	await Bot.SQL.CreateTables();
-
-	if (Bot.Config.TRANSFER) {
-		await Transfer();
-	}
 
 	await import('./api/index.js');
 

@@ -11,7 +11,7 @@ export async function ChannelEmoteManager(mapped: IEmoteSet[]): Promise<IChannel
 			continue;
 		}
 
-		const emotesListed = emote_sets.emotes.map((emote: { name: string }) => emote.name);
+		const emotesListed = emote_sets.emotes.map((emote: { name: string, alias: string, id: string }) => ({ name: emote.data.name, alias: emote.name, id: emote.id }));
 
 		if (emotesListed.length === 0) {
 			Bot.Logger.Warn(`7TV returned no emotes for ${username} (${id})`);

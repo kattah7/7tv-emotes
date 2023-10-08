@@ -25,12 +25,14 @@ export type Config = {
 
 export type NewEmote = {
 	id: string;
+	alias: string | null;
 	name: string;
 };
 
 export type UpdateEmote = {
 	dbEmote: string;
 	name: string;
+	alias: string | null;
 	id: string;
 	channelId: string;
 	channelName: string;

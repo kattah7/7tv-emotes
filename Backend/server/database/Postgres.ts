@@ -71,6 +71,7 @@ export class Postgres {
 		await this.Query(`CREATE TABLE IF NOT EXISTS emotes (
 			twitch_id VARCHAR(30) NOT NULL,
 			emote TEXT NOT NULL,
+			emote_alias TEXT,
 			emote_id TEXT NOT NULL,
 			emote_count INTEGER DEFAULT 0 NOT NULL,
 			added TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -81,22 +82,22 @@ export class Postgres {
 
 	async NewEmote(twitch_id: string, twitch_name: string, emote: NewEmote): Promise<void> {
 		await this.Query(
-			`INSERT INTO emotes (twitch_id, emote, emote_id) 
-			 VALUES ($1, $2, $3)`,
-			[twitch_id, emote.name, emote.id],
+			`INSERT INTO emotes (twitch_id, emote, emote_alias, emote_id) 
+			 VALUES ($1, $2, $3, $4)`,
+			[twitch_id, emote.name, emote.alias, emote.id],
 		);
 
 		Bot.Logger.Debug(`New Emote ${emote.name} added to ${twitch_name}`);
 	}
 
 	async UpdateEmote(emotes: UpdateEmote): Promise<void> {
-		const { dbEmote, name, id, channelId, channelName } = emotes;
+		const { dbEmote, name, alias, id, channelId, channelName } = emotes;
 		await Bot.SQL.Query(
-			`INSERT INTO emotes (twitch_id, emote, emote_id)
-			     VALUES ($1, $2, $3)
+			`INSERT INTO emotes (twitch_id, emote, emote_alias, emote_id)
+			     VALUES ($1, $2, $3, $4)
 			     ON CONFLICT (twitch_id, emote_id)
-			     DO UPDATE SET emote = $2 WHERE emotes.emote != $2`,
-			[channelId, name, id],
+			     DO UPDATE SET emote_alias = $3 WHERE emotes.id = $4`,
+			[channelId, name, alias, id],
 		);
 
 		Bot.Logger.Debug(`Emote name changed ${dbEmote} -> ${name} in ${channelName}`);
@@ -111,17 +112,20 @@ export class Postgres {
 				emoteInfo.id,
 			]);
 
+			const emoteAlias = (emoteInfo.name == emoteInfo.data.name) ? null : emoteInfo.name
+
 			if (getEmote.rowCount === 0) {
-				await this.NewEmote(twitch_id, twitch_username, { name: emoteInfo.name, id: emoteInfo.id });
+				await this.NewEmote(twitch_id, twitch_username, { name: emoteInfo.data.name, alias: emoteAlias, id: emoteInfo.id });
 				continue;
 			}
 
-			const { emote, emote_id } = getEmote.rows[0];
-			if (emote === emoteInfo.name && emote_id === emoteInfo.id) continue;
+			const { emote_alias, emote_id } = getEmote.rows[0];
+			if (emote_alias === emoteAlias && emote_id === emoteInfo.id) continue;
 
 			const Payload = {
 				dbEmote: emote,
-				name: emoteInfo.name,
+				name: emoteInfo.data.name,
+				alias: emoteAlias,
 				id: emoteInfo.id,
 				channelId: twitch_id,
 				channelName: twitch_username,

@@ -4,6 +4,7 @@ const Router = Express.Router();
 
 type Emote = {
 	emote: string;
+	emote_alias: string | null;
 	emote_id: string;
 	emote_count: number;
 	added: Date;
@@ -35,6 +36,7 @@ Router.get('/c/:username', Limiter(1000, 10), async (req, res) => {
 	const emotes = channelEmotes.rows.map((emote: Emote) => {
 		return {
 			emote: emote.emote,
+			emote_alias: emote.emote_alias,
 			emote_id: emote.emote_id,
 			count: emote.emote_count,
 			added: emote.added,
