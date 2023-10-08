@@ -1,0 +1,26 @@
+{	
+	"Postgres": {
+		"password": "Put your password here",
+		"user": "postgres",
+		"host": "localhost",
+		"port": 5432,
+		"database": "emotes"
+	},
+	"Twitch": {
+		"username": "justinfan69696",
+		"oauth": "nothing",
+		"clientId": "nothing",
+		"clientSecret": "nothing"
+	},
+	"DEBUG": false,
+	"API": {
+		"port": 5001
+	},
+	"WS": {
+		"port": 9100
+	},
+	"Admins": [
+		"88492428",
+		"475748597"
+	]
+}

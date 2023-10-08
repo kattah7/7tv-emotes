@@ -2,6 +2,12 @@
 
 The purpose for this is track 7TV emote usage.
 
+## Setting up Config
+
+This is configured using a config file. Duplicate the `config_template.json` file and rename it to `config.json`, then replace the necessary values.
+
+<strong><code>config_template.json</code></strong> -> <strong><code>config.json</code></strong>
+
 ### API
 
 ```
