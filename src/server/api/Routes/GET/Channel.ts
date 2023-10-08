@@ -12,7 +12,7 @@ type Emote = {
 
 Router.get('/c/:username', Limiter(1000, 10), async (req, res) => {
 	let { username } = req.params;
-	const limit = req.query.limit || 100;
+	const limit = req.query.limit || -1;
 	username = username.toLowerCase();
 
 	const channelData = await Bot.SQL.Query(`SELECT * FROM channels WHERE twitch_username = $1`, [username]);
@@ -48,7 +48,7 @@ Router.get('/c/:username', Limiter(1000, 10), async (req, res) => {
 		user: {
 			...channelData.rows[0],
 		},
-		emotes: emotes.slice(0, limit),
+		emotes: (limit == null) ? emotes : emotes.slice(0, limit),
 	});
 });
 
